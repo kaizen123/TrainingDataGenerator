@@ -1,0 +1,29 @@
+The Perfect Workspace
+
+Documentation and Reports:
+	GoogleDocs
+	ShareLatex
+
+Project Managment:
+	Slack (papers, files, messages)
+	Trello (tasks)
+
+Version Control:
+	github + github-desktop
+
+Coding:
+	Text - Sublime Text
+		Package Control
+		SublimeREPL (interperter inside sublime - Matlab/Python etc.)
+		SideBar Enhancments (create files from side-bar)
+		Alignment (align code, variable assignment etc.)
+		Colorschemes (I prefer 1337 / Boron / Monokai)
+		Vintageous (Vim emulation)
+		Matlab Completions
+		All Autocomplete (complete words from all files in project)
+		SublimeLinter (lint code) + mlint (Matlab)
+	IDE - Matlab / Pycharm
+
+Browsing
+	Chrome + Session Buddy
+	Google Scholar

@@ -12,7 +12,10 @@ function [params] = TDGLoadParams(source_type, cell_dataset, pointer)
 if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
-		params.number_of_frames             = 2;
+		params.num_of_frames             	= 2;
+		params.cell_count_per_frame 		= [9 9];
+		assert(length(params.cell_count_per_frame) == params.num_of_frames,...
+			'Number of frames is not equal to the given cell count per frame'); 
 		params.min_cell_size                = 100;
 		% PreProcessing parameters
 		params.pp.gauss_bg_filter.enable    = true;	

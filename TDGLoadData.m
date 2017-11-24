@@ -9,7 +9,7 @@ function [data] = TDGLoadData(source_type, cell_dataset, pointer)
 %                    for 'struct' it is the struct of data
 % OUTPUTS:  data: data struct for the TDG
 
-if strcmp(source_type, 'script')	
+if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
 		% TODO asaf - change to a for loop with automatic string creation
