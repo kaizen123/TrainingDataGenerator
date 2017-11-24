@@ -9,6 +9,7 @@ function [params] = TDGLoadParams(source_type, cell_dataset, pointer)
 %                    for 'struct' it is the struct of parameters
 % OUTPUTS:  params: parameters struct for the TDG
 
+params.cell_dataset = cell_dataset;
 if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'

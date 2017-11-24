@@ -1,4 +1,4 @@
-function [features] = TDGFeatureExtract(source_type, source)
+function [features] = TDGExtractFeatures(source_type, source)
 % extracts features from a frame or copies a different struct of features
 % code referenced from:
 % https://github.com/arbellea/CellTrackingAndSegmentationPublic/blob/master/calcFeatures.m
