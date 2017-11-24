@@ -1,0 +1,6 @@
+function [output] = TDGFunctionTemplate(input, varargin)
+% function description
+% INPUTS:	input: matrix [m*n] that is...   
+% OUTPUTS: 	output: string / uint / bool...
+
+end
