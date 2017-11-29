@@ -3,12 +3,18 @@ function [double_img] = TDGLoadDoubleImage(img_address)
 % INPUTS:   img_address: string, relative address of img to load
 % OUTPUTS:  double_img: normalized matrix, double precision, range [0,1]
 
-img     = double(imread(img_address));
+try
+	img = double(imread(img_address));
+catch
+	fprintf('%s does not exist. returning 0.\n', img_address);
+	double_img = false;
+	return;
+end
 if size(img,3) == 3
     img = rgb2gray(img);
 end
 double_img = img / max(max(img));
-disp(sprintf('%s was loaded', img_address));
+fprintf('%s was loaded\n', img_address);
 
 end
 

@@ -7,6 +7,8 @@ function [features] = TDGExtractFeatures(source_type, source)
 % 					if source_type is 'struct' then source is a struct containing the calculated features
 % OUTPUTS: 	features: a struct of the extracted features
 
+assert(strcmp(source_type, 'frame') | strcmp(source_type, 'struct'), 'source type not supported');
+
 if strcmp(source_type, 'frame')
 	sobel_h = fspecial('sobel');
 	log_h   = fspecial('log');

@@ -9,12 +9,14 @@ function [data] = TDGLoadData(source_type, params, pointer)
 %                    for 'struct' it is the struct of data
 % OUTPUTS:  data: data struct for the TDG
 
+assert(strcmp(source_type, 'text') | strcmp(source_type, 'script')...
+	| strcmp(source_type, 'struct'), 'source_type not supported');
 if strcmp(source_type, 'script')
 	switch params.cell_dataset
 	case 'fluo-c2dl-msc'
 		for n = 1 : params.num_of_frames
-			train_labels_string = sprintf('Data/%s/TrainLabels/ManualSeg_%d.tif', params.cell_dataset, n);
-			train_data_string 	= sprintf('Data/%s/TrainData/t00%d.tif', params.cell_dataset, n);
+			train_labels_string  = sprintf('Data/%s/TrainLabels/ManualSeg_%d.tif', params.cell_dataset, n);
+			train_data_string    = sprintf('Data/%s/TrainData/t00%d.tif', params.cell_dataset, n-1);
 			data.ground_truth{n} = TDGLoadDoubleImage(train_labels_string);
 			data.loaded_frame{n} = TDGLoadDoubleImage(train_data_string);
 		end

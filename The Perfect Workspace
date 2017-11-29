@@ -12,17 +12,19 @@ Version Control:
 	github + github-desktop
 
 Coding:
-	Text - Sublime Text
+	Text - Sublime Text. Packages are super important:
 		Package Control
 		SublimeREPL (interperter inside sublime - Matlab/Python etc.)
-		SideBar Enhancments (create files from side-bar)
+		SideBar Enhancments (create files / folders from side-bar)
 		Alignment (align code, variable assignment etc.)
-		Colorschemes (I prefer 1337 / Boron / Monokai)
-		Vintageous (Vim emulation)
+		Vintageous (Vim emulation - for these who are used to VIM)
 		Matlab Completions
 		All Autocomplete (complete words from all files in project)
 		SublimeLinter (lint code) + mlint (Matlab)
-	IDE - Matlab / Pycharm
+		1337 (Color Scheme)
+		Agila (UI theme)
+	IDE - for debugging use MATLAB desktop / Pycharm
+	Ipython - for presenting the research, and interactive programming
 
 Browsing
 	Chrome + Session Buddy

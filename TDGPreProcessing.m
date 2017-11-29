@@ -4,8 +4,8 @@ function [pp_frame] = TDGPreProcessing(frame, params)
 %           params: parameters struct for the TDG
 % OUTPUTS: 	pp_frame: [k*l] matrix of greyscale intensity values. default is (k=m ; l=n)
 
-if params.pp.gauss_bg_filter.enable
-	pp_frame = frame - imgaussfilt(frame, params.pp.gauss_bg_filter.sigma);
+if params.pp.remove_bg_lighting.enable
+	pp_frame = frame - imgaussfilt(frame, params.pp.remove_bg_lighting.sigma);
 	pp_frame = max(0, pp_frame);
 end
 if params.pp.median_filter.enable

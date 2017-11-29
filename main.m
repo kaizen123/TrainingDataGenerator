@@ -10,4 +10,5 @@ data         = TDGLoadData('script', params);
 for n = 1 : params.num_of_frames
 	data.pp_frame{n} = TDGPreProcessing(data.loaded_frame{n}, params);
 	data.features{n} = TDGExtractFeatures('frame', data.pp_frame{n});
+	% data.fg_probability_map{n} = TDGProbabilityMap(data.pp_frame{n}, data, params);
 end
