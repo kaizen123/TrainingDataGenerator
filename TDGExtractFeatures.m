@@ -1,4 +1,4 @@
-function [features] = TDGExtractFeatures(source_type, source)
+function [features] = TDGExtractFeatures(source_type, source, params)
 % extracts features from a frame or copies a different struct of features
 % code referenced from:
 % https://github.com/arbellea/CellTrackingAndSegmentationPublic/blob/master/calcFeatures.m
@@ -22,11 +22,10 @@ if strcmp(source_type, 'frame')
 	features.sobel_vertical   = imfilter(source, sobel_h.');
 	features.grad             = sqrt(features.sobel_horizontal.^2 + features.sobel_vertical.^2);    
 	features.gaussian         = imgaussfilt(source, 0.7);
+	features.otsu 			  = imbinarize(source, graythresh(source) + params.otsu_th_fix);
 end
-% TODO asaf - should I normalize all features?
-
+% TODO asaf - should I normalize all features? + remove unused features.
 % Data_std = std(Data,0,1);
 % Data_norm = bsxfun(@rdivide, Data, Data_std);
-
 
 end
