@@ -3,14 +3,16 @@
 % 1. mu calculation for FM?
 % 2. why crop? how crop?
 % 3. differance between first iterations and the rest
-% 
-global debug;
-debug.clear = false;
-debug.enable = true;
 
-if debug.clear
-	clear; clc; close all;
+% Working dir: /Users/asafmanor/Documents/GitHub/TrainingDataGenerator 
+test.clear = false;
+
+if test.clear
+	clear variables; clc; close all;
 end
+
+global debug;
+debug.enable = true;
 %% primary parameters - dataset, test method, debug etc.
 disp('Welcome to the Training Data Generator for HRM Cell images!')
 cell_dataset   = 'fluo-c2dl-msc';
@@ -23,6 +25,7 @@ params         = TDGLoadParams('script', cell_dataset);
 for n = 1 : params.num_of_frames
 	debug.index = n;
 	data.pp_frame{n}   = TDGPreProcessing(data.loaded_frame{n}, params);
+	data.seeds{n} 	   = TDGUserInput(data.loaded_frame{n}, params, n);
 	data.features{n}   = TDGExtractFeatures('frame', data.pp_frame{n}, params);
 	data.otsu_masks{n} = data.features{n}.otsu; % TODO asaf - remove data copy, decide on one implementation
 end
@@ -37,9 +40,15 @@ masks_3d_matrix          = cat(3, data.otsu_masks{:});
 gray_probability         = (alpha*fg_density) ./ (alpha*fg_density + (1-alpha)*bg_density);
 
 for n = 1 : params.num_of_frames
-	I  	= data.pp_frame{n};
-	features.gray_probability_map = gray_probability(round(data.pp_frame{1}) + 1);
-	% [~] = TDGFastMarchingMask(I, data.features{n}, params);
+	debug.index = n;
+	I = data.pp_frame{n};
+	data.features{n}.gray_probability_map = gray_probability(round(I) + 1);
+	% test - asaf: need to recieve the mask when TDGFastMarchingMask is finished
+	TDGFastMarchingMask(I, data.features{n}, data.seeds{n}, params);
+	% test - asaf
 end
 
 %% handle debug
+diff_dist      = debug.frame{1}.diff_dist;
+geodesic_dist  = debug.frame{1}.geodesic_dist; % assaf says better
+euclidean_dist = debug.frame{1}.euclidean_dist;
