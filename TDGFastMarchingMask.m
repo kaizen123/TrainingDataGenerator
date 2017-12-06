@@ -1,10 +1,11 @@
-function [fast_marching_mask] = TDGFastMarchingMask(frame, features, seeds, params)
+function [fast_marching_mask] = TDGFastMarchingMask(frame, features, seeds, index, params)
 % returns the binary mask of the fast marching algorithm.
 % INPUTS:	frame - greyscale image
 %			features - feature struct for the current frame
 %			params - paramters struct for the TDG
-% 			seeds - [k*3] matrix containing the user marks (x,y) coordinates and the button pressed when taken
-%					where k is the the number of seeds given (usually number of cells in the frame)
+% 			seeds - [s*2] matrix containing the user marks (x,y) coordinates
+%					where s is the the number of seeds given (number of cells in the frame)
+%			index - scalar, the index of the current frame being processed
 % OUTPUTS: 	fast_marching_mask - binary mask, the size of frame
 
 global debug;
@@ -15,24 +16,30 @@ q     = params.fm.q;
 grad  = features.grad;
 gray_probability_map = features.gray_probability_map;
 frame_grad_inverse   = max(1./(1+(grad./(k*std(grad(:)))).^q), 0.01); %TODO asaf - agree with values of 0.01?
-speed_map            = max(gray_probability_map .* frame_grad_inverse, 0.01); %TODO asaf - speed  = -1/log(speed)
+speed_map            = max(gray_probability_map .* frame_grad_inverse, 0.01);
+speed_map 			 = -1 ./ log(speed_map); % done to map [0,1] to [0, inf)
+
+for m = 1:size(seeds,1)
+	%% TODO crop speed_map using correct seed into speed_map_crop{m}
+	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, seeds(m), params.convex_cell_shapes)
+	%% TODO uncrop image and fill with specific value
+end
+
 
 if debug.enable
-index = debug.index;
+	index = debug.index;
 	debug.frame{index}.size_gray_prob_map   = size(gray_probability_map);
 	debug.frame{index}.gray_probability_map = gray_probability_map;
 	debug.frame{index}.speed_map            = speed_map;
 end
-
-% calculate distances
-[diff_dist, geodesic_dist, euclidean_dist] = TDGDistanceMaps(speed_map, seeds);
-
 end
 
-function [diff_dist, geodesic_dist, euclidean_dist] = TDGDistanceMaps(speed_map, seeds)
+function [diff_dist, geodesic_dist, euclidean_dist] = TDGDistanceMaps(speed_map, seeds, convex_cell_shapes)
 % returns geodesic and "nearest seed" distance maps for every pixel in the picture
 % INPUTS:	speed_map - the speed map used to calculate the geodesic distance
-% 			seeds - [n*2] matrix containing pairs of coordinates from which the fast marching will start spreading
+% 			seeds - [s*2] vector containing a pairs of coordinates from which the fast marching will start spreading
+%			-- note -- currently we call the function only with s=1, but it works with any positive integer.
+%			convex_cell_shapes - if our data is generally of convex shaped cells, we can normalize the distance with euclidean disfance.
 % OUTPUTS: 	diff_dist - 0 if euclidean_dist is bigger than geodesic_dist for every pixel, otherwise the difference. size of speed_map.
 %		 	geodesic_dist - the geodesic distance map, size of speed_map
 % 			nearesat_seed_distance - the 'nearest seed' distance map, size of speed_map
@@ -50,16 +57,18 @@ seeds_mask = [seeds_mask , zeros(size(seeds_mask,1), size_diff(2))];
 seeds_mask = [seeds_mask ; zeros(size_diff(1), size(seeds_mask,2))];
 assert(all(size(seeds_mask) == size(speed_map)),...
 	'speed_map size and seeds_mask do not match.\n size(speed_map)=%d \n size(seeds_mask)=%d', size(speed_map), size(seeds_mask));
-euclidean_dist = max(double(bwdist(seeds_mask, 'quasi-euclidean')), eps);
 % seeds need to be transposed so that the first row is coordinates in y, and the second is coordinates in x.
-geodesic_dist     = max(msfm2d(speed_map, seeds', true, true), eps); % the method will use second order derivatives and cross neighbours
-diff_dist         = max(geodesic_dist - euclidean_dist, 0);
+geodesic_dist      = max(msfm2d(speed_map, seeds', true, true), eps); % the method will use second order derivatives and cross neighbours
+if (convex_cell_shapes)
+	euclidean_dist = max(double(bwdist(seeds_mask, 'quasi-euclidean')), eps);
+	dist_map       = max(geodesic_dist - euclidean_dist, 0);
+else
+	dist_map = geodesic_dist; %TODO asaf - consider the data copy
+end
 
 if debug.enable
 	index = debug.index;
-	debug.frame{index}.diff_dist      = diff_dist;
-	debug.frame{index}.geodesic_dist  = geodesic_dist;
-	debug.frame{index}.euclidean_dist = euclidean_dist;
-	debug.frame{index}.seeds_mask     = seeds_mask;
+	debug.frame{index}.dist_map   = dist_map;
+	debug.frame{index}.seeds_mask = seeds_mask;
 end
 end

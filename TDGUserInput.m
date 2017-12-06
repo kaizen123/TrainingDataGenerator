@@ -39,7 +39,6 @@ prompt = 'press any key to continue';
 input(prompt);
 figure;
 imshow(uint16(frame));
-% [x,y,button] = ginput(params.cell_count_per_frame(index));
 [x,y] = ginput(params.cell_count_per_frame(index));
 seeds = [y,x];
 % seeds = [x,y,button];
