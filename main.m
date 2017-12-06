@@ -24,10 +24,13 @@ params         = TDGLoadParams('script', cell_dataset);
 %% frames preprocessing and feature extraction
 for n = 1 : params.num_of_frames
 	debug.index = n;
-	data.pp_frame{n}   = TDGPreProcessing(data.loaded_frame{n}, params);
-	data.seeds{n} 	   = TDGUserInput(data.loaded_frame{n}, params, n);
-	data.features{n}   = TDGExtractFeatures('frame', data.pp_frame{n}, params);
-	data.otsu_masks{n} = data.features{n}.otsu; % TODO asaf - remove data copy, decide on one implementation
+	data.pp_frame{n}                         = TDGPreProcessing(data.loaded_frame{n}, params);
+	data.seeds{n}                            = TDGUserInput(data.loaded_frame{n}, params, n);
+	data.features{n}                        = TDGExtractFeatures('frame', data.pp_frame{n}, params);
+	data.otsu_masks{n}                      = data.features{n}.otsu; % TODO asaf - remove data copy, decide on one implementation
+%    for m = 1:size(data.seeds{n},1)
+%        [data.crop{n}.cell{m} data.crop{n}.index{m}] = CropImage(data.pp_frame{n},data.seeds{n}(m,:),params);  
+%    end 
 end
 
 %% intensity distribution calculation
@@ -55,3 +58,5 @@ end
 diff_dist      = debug.frame{1}.diff_dist;
 geodesic_dist  = debug.frame{1}.geodesic_dist; % assaf says better
 euclidean_dist = debug.frame{1}.euclidean_dist;
+
+
