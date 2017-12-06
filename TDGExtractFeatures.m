@@ -22,7 +22,9 @@ if strcmp(source_type, 'frame')
 	features.sobel_vertical   = imfilter(source, sobel_h.');
 	features.grad             = sqrt(features.sobel_horizontal.^2 + features.sobel_vertical.^2);    
 	features.gaussian         = imgaussfilt(source, 0.7);
-	features.otsu 			  = imbinarize(source, graythresh(source) + params.otsu_th_fix);
+    norm_source               = source/(2^16-1);
+	features.otsu 			  = im2bw(norm_source,params.otsu_th_fix);
+    
 end
 % TODO asaf - should I normalize all features? + remove unused features.
 % Data_std = std(Data,0,1);
