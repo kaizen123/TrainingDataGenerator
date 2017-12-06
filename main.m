@@ -4,8 +4,8 @@
 % 2. why crop? how crop?
 % 3. differance between first iterations and the rest
 
-% Working dir: /Users/asafmanor/Documents/GitHub/TrainingDataGenerator 
-test.clear = true;
+cd /Users/asafmanor/Documents/GitHub/TrainingDataGenerator 
+test.clear = false;
 
 if test.clear
 	clear variables; clc; close all;
@@ -28,9 +28,9 @@ for n = 1 : params.num_of_frames
 	data.seeds{n}                            = TDGUserInput(data.loaded_frame{n}, params, n);
 	data.features{n}                        = TDGExtractFeatures('frame', data.pp_frame{n}, params);
 	data.otsu_masks{n}                      = data.features{n}.otsu; % TODO asaf - remove data copy, decide on one implementation
-    for m = 1:size(data.seeds{n},1)
-        [data.crop{n}.cell{m} data.crop{n}.index{m}] = CropImage(data.pp_frame{n},data.seeds{n}(m,:),params);  
-    end 
+%    for m = 1:size(data.seeds{n},1)
+%        [data.crop{n}.cell{m} data.crop{n}.index{m}] = CropImage(data.pp_frame{n},data.seeds{n}(m,:),params);  
+%    end 
 end
 
 %% intensity distribution calculation
@@ -47,6 +47,9 @@ for n = 1 : params.num_of_frames
 	I = data.pp_frame{n};
 	data.features{n}.gray_probability_map = gray_probability(round(I) + 1);
 	% test - asaf: need to recieve the mask when TDGFastMarchingMask is finished
+	if size(seeds{n},1) ~= params.cell_count_per_frame(n)
+		warning('Number of seeds is not equal to number of cells in frame %d', n);
+	end
 	TDGFastMarchingMask(I, data.features{n}, data.seeds{n}, params);
 	% test - asaf
 end
