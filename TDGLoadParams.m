@@ -18,12 +18,12 @@ params.cell_dataset = cell_dataset;
 if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
-		params.otsu_th_fix 					= 0.027;
-		params.num_of_frames             	= 2;
-		params.cell_count_per_frame 		= [9 9];
+		params.otsu_th_fix                  = 0.027;
+		params.num_of_frames                = 2;
+		params.cell_count_per_frame         = [9 9];
 		params.min_cell_size                = 100;
-		params.convex_cell_shapes 			= false;
-    params.crop_size = [150 150]
+		params.convex_cell_shapes           = false;
+		params.crop_size                    = [150 150]
 		% PreProcessing parameters
 		params.pp.remove_bg_lighting.enable = true;
 		params.pp.remove_bg_lighting.sigma  = 100;

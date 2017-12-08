@@ -4,7 +4,7 @@
 % 2. why crop? how crop?
 % 3. differance between first iterations and the rest
 
-cd /Users/asafmanor/Documents/GitHub/TrainingDataGenerator 
+% cd /Users/asafmanor/Documents/GitHub/TrainingDataGenerator 
 test.clear = false;
 
 if test.clear

@@ -19,9 +19,15 @@ frame_grad_inverse   = max(1./(1+(grad./(k*std(grad(:)))).^q), 0.01); %TODO asaf
 speed_map            = max(gray_probability_map .* frame_grad_inverse, 0.01);
 speed_map 			 = -1 ./ log(speed_map); % done to map [0,1] to [0, inf)
 
+s = size(seeds,1)
+speed_map_crop = cell(s,1);
+dist_map_crop  = cell(s,1);
+crop_indices   = cell(s,1);
+% TODO - consider the use of cell functions
 for m = 1:size(seeds,1)
-	%% TODO crop speed_map using correct seed into speed_map_crop{m}
-	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, seeds(m), params.convex_cell_shapes)
+	[speed_map_crop{m}, crop_indices{m}] = CropImage(speed_map, seeds(m,:), params);
+	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, seeds(m,:), params.convex_cell_shapes);
+
 	%% TODO uncrop image and fill with specific value
 end
 
