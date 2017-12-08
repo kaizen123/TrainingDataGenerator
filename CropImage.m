@@ -8,7 +8,6 @@ function [crop, crop_indices] = CropImage(frame,seed,params)
 %           contains all the original frame linear crop_indices of the crooped frame
 
 assert(all(seed <=size(frame)) & all(seed>=0), 'COM coordinates mismatch');
-
 % define patch corners and crop the original frame  
 h  = params.crop_size(1);
 w  = params.crop_size(2);

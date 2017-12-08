@@ -20,19 +20,14 @@ cell_dataset   = 'fluo-c2dl-msc';
 %% load data and parameters
 params         = TDGLoadParams('script', cell_dataset);
 [data, params] = TDGLoadData('script', params); 
-
 %% frames preprocessing and feature extraction
 for n = 1 : params.num_of_frames
 	debug.index = n;
 	data.pp_frame{n}   = TDGPreProcessing(data.loaded_frame{n}, params);
 	data.seeds{n}      = TDGUserInput(data.loaded_frame{n}, params, n);
 	data.features{n}   = TDGExtractFeatures('frame', data.pp_frame{n}, params);
-	data.otsu_masks{n} = data.features{n}.otsu; % TODO asaf - remove data copy, decide on one implementation
-%    for m = 1:size(data.seeds{n},1)
-%        [data.crop{n}.cell{m} data.crop{n}.index{m}] = CropImage(data.pp_frame{n},data.seeds{n}(m,:),params);  
-%    end 
+	data.otsu_masks{n} = data.features{n}.otsu; % TODO asaf - remove data copy, decide on one implementationp
 end
-
 %% intensity distribution calculation
 alpha = params.fm.probability_map_alpha;
 % calculate the fg (cells) and bg density functions based on using an unsupervised learning algorithm.
@@ -41,16 +36,15 @@ frames_3d_matrix         = cat(3, data.pp_frame{:});
 masks_3d_matrix          = cat(3, data.otsu_masks{:});
 [fg_density, bg_density] = TDGFgBgDistributions(frames_3d_matrix, masks_3d_matrix, params);
 gray_probability         = (alpha*fg_density) ./ (alpha*fg_density + (1-alpha)*bg_density);
-
 for n = 1 : params.num_of_frames
 	debug.index = n;
 	I = data.pp_frame{n};
 	data.features{n}.gray_probability_map = gray_probability(round(I) + 1);
 	% test - asaf: need to recieve the mask when TDGFastMarchingMask is finished
-	if size(seeds{n},1) ~= params.cell_count_per_frame(n)
+	if size(data.seeds{n},1) ~= params.cell_count_per_frame(n)
 		warning('Number of seeds is not equal to number of cells in frame %d', n);
 	end
-	TDGFastMarchingMask(I, data.features{n}, data.seeds{n}, params);
+	results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
 	% test - asaf
 end
 

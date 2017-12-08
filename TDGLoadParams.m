@@ -23,7 +23,7 @@ if strcmp(source_type, 'script')
 		params.cell_count_per_frame         = [9 9];
 		params.min_cell_size                = 100;
 		params.convex_cell_shapes           = false;
-		params.crop_size                    = [150 150]
+		params.crop_size                    = [150 150];
 		% PreProcessing parameters
 		params.pp.remove_bg_lighting.enable = true;
 		params.pp.remove_bg_lighting.sigma  = 100;
