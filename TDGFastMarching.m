@@ -32,39 +32,36 @@ dist_map_expended = cell(s,1);
 crop_indices      = cell(s,1);
 aposteriori_prob  = zeros(size(frame,1), size(frame,2), s+1);
 aposteriori_prob(:,:,1) = (1-gray_probability_map);
+shifted_seeds = zeros(size(seeds));
 % TODO - consider the use of cell functions
 for m = 1:s
-	[speed_map_crop{m}, crop_indices{m}] = CropImage(speed_map, seeds(m,:), params);
-	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, seeds(m,:), params.convex_cell_shapes);
-	dist_map_expended{m} = UnCropImage(size(frame), dist_map_crop{m}, 1/eps);
+	[speed_map_crop{m}, crop_indices{m}, shifted_seeds(m,:)] = CropImage(speed_map, seeds(m,:), params);
+	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, shifted_seeds(m,:), params.convex_cell_shapes);
+	dist_map_expended{m} = UnCropImage(size(frame), dist_map_crop{m}, crop_indices{m}, 1/eps);
 	aposteriori_prob(:,:,m+1) = 1./(dist_map_expended{m} + 1);
 	if debug.enable
 		debug.frame{index}.speed_map_crop{m}     = speed_map_crop{m};
 		debug.frame{index}.dist_map_crop{m}      = dist_map_crop{m};
 		debug.frame{index}.dist_map_expended{m}  = dist_map_expended{m};
-		debug.frame{index}.aposteriori_prob{m+1} = aposteriori_prob{m+1};
+		debug.frame{index}.aposteriori_prob(:,:,m+1) = aposteriori_prob(:,:,1);
+		debug.frame{index}.aposteriori_prob(:,:,m+1) = aposteriori_prob(:,:,m+1);
 	end
 end
 
-seg = max(aposteriori_prob,3);
+[~, seg] = max(aposteriori_prob,[],3);
+figure;
 imagesc(seg);
 end
 
-function [diff_dist, geodesic_dist, euclidean_dist] = TDGDistanceMaps(speed_map, seeds, convex_cell_shapes)
+function [dist_map] = TDGDistanceMaps(speed_map, seeds, convex_cell_shapes)
 % returns geodesic and "nearest seed" distance maps for every pixel in the picture
 % INPUTS:	speed_map - the speed map used to calculate the geodesic distance
 % 			seeds - [s*2] vector containing a pairs of coordinates from which the fast marching will start spreading
 %			-- note -- currently we call the function only with s=1, but it works with any positive integer.
 %			convex_cell_shapes - if our data is generally of convex shaped cells, we can normalize the distance with euclidean disfance.
-% OUTPUTS: 	diff_dist - 0 if euclidean_dist is bigger than geodesic_dist for every pixel, otherwise the difference. size of speed_map.
-%		 	geodesic_dist - the geodesic distance map, size of speed_map
-% 			nearesat_seed_distance - the 'nearest seed' distance map, size of speed_map
+% OUTPUTS: 	dist_map --TODO--
 
 global debug;
-isnan(seeds(:))
-seeds(:,1)
-seeds(:,2)
-size(speed_map)
 
 assert(~any(isnan(seeds(:))) & ~any(seeds(:) < 1) & ~(any(seeds(:,1) > size(speed_map,1))) & ~(any(seeds(:,2) > size(speed_map,2))),...
 	'seed locations are out of bounds');
@@ -93,3 +90,49 @@ if debug.enable
 	debug.frame{index}.seeds_mask = seeds_mask;
 end
 end
+
+function [crop, crop_indices, shifted_seed] = CropImage(frame,seed,params)
+% return the crop image of the cell defined by the cell's COM in size [params.crop.crop_size]
+% INPUTS:	frame - greyscale image [m*n]
+%           params - parameters struct for the TDG
+%           seed -  1X2 vector containing the cell's COM coordinates   
+% OUTPUTS: 	crop - crop greyscale image size [params.crop.crop_size] 
+%           crop_indices - vector size [(params.crop.crop_size(1)+1)*(params.crop.crop_size(2)+1)X1]
+%           contains all the original frame linear crop_indices of the crooped frame
+
+assert(all(seed <=size(frame)) & all(seed>=0), 'COM coordinates mismatch');
+% define patch corners and crop the original frame  
+h  = params.crop_size(1);
+w  = params.crop_size(2);
+y1 = max(round(seed(1)-h/2),1);
+y2 = min(round(seed(1)+h/2),size(frame,1));
+x1 = max(round(seed(2)-w/2),1);
+x2 = min(round(seed(2)+w/2),size(frame,2));
+crop = frame(y1:y2,x1:x2);
+if nargout > 1
+	[X,Y]   = meshgrid(x1:x2,y1:y2);
+	crop_indices = sub2ind(size(frame),Y(:),X(:));
+	if nargout > 2
+		shifted_seed = [seed(1) - y1, seed(2) - x1];
+	end
+end
+end
+
+function [uncrop_frame] = UnCropImage(uncrop_size, crop, crop_indices, fill_value)
+% 
+% INPUTS: TODO
+% OUTPUTS:TODO 	
+if all(size(fill_value) == uncrop_size)
+	uncrop_frame = fill_value;
+elseif size(fill_value) == 1
+	if fill_value == 0
+		uncrop_frame = zeros(uncrop_size);
+	else
+		uncrop_frame = fill_value * ones(uncrop_size);
+	end
+else
+	error('fill_value size is not supported');
+end
+	uncrop_frame(ind2sub(uncrop_size, crop_indices)) = crop;
+end
+

@@ -1,16 +1,5 @@
 % initialize debug and test mode
-% questions for Assaf -
-% 1. mu calculation for FM?
-% 2. why crop? how crop?
-% 3. differance between first iterations and the rest
-
 % cd /Users/asafmanor/Documents/GitHub/TrainingDataGenerator 
-test.clear = false;
-
-if test.clear
-	clear variables; clc; close all;
-end
-
 global debug;
 debug.enable = true;
 %% primary parameters - dataset, test method, debug etc.
@@ -47,10 +36,5 @@ for n = 1 : params.num_of_frames
 	results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
 	% test - asaf
 end
-
-%% handle debug
-diff_dist      = debug.frame{1}.diff_dist;
-geodesic_dist  = debug.frame{1}.geodesic_dist; % assaf says better
-euclidean_dist = debug.frame{1}.euclidean_dist;
 
 
