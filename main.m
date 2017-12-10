@@ -14,7 +14,7 @@ for n = 1 : params.num_of_frames
 	debug.index = n;
 	data.pp_frame{n} = TDGPreProcessing(data.loaded_frame{n}, params);
 	data.seeds{n}    = TDGUserInput(data.loaded_frame{n}, params, n);
-	data.features{n} = TDGExtractFeatures('frame', data.pp_frame{n}, params);
+	data.features{n} = TDGExtractFeatures('frame', data.pp_frame{n}, params,data.seeds{n});
 	 % TODO asaf - remove data copy, decide on one implementation
 	if strcmp(params.fm.probability_map_method,'voronoi')
 		data.masks{n} = data.features{n}.voronoi_mask;

@@ -19,6 +19,6 @@ if strcmp(source_type, 'frame')
 	features.grad             = sqrt(features.sobel_horizontal.^2 + features.sobel_vertical.^2);
 	norm_source               = source/(2^16-1);
 	features.otsu             = im2bw(norm_source, params.otsu_th_fix); %TODO asaf - this is a mistake. no real use of otsu!!
-	features.voronoi_mask     = voronoi2mask(seeds(1), seeds(2), size(source));
+	features.voronoi_mask     = voronoi2mask(seeds(:,2), seeds(:,1), size(source));
 end
 end
