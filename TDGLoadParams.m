@@ -47,6 +47,6 @@ end
 % parameters assertions
 assert(length(params.cell_count_per_frame) == params.num_of_frames,...
 	'Number of frames is not equal to the given cell count per frame');
-TDGStringAssertion(params.fm.probability_map_method,'probability map method','gmm','kde');
+TDGStringAssertion(params.fm.probability_map_method,'probability map method','gmm','kde','voronoi');
 TDGStringAssertion(params.fm.distance,'fm distance method','diff','geodesic');
 end

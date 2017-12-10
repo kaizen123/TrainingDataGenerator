@@ -17,8 +17,12 @@ if strcmp(params.fm.probability_map_method, 'gmm')
 	bg_density          = pdf(bg_dist_object, params.fm.dens_x);
 	return;
 end
+if strcmp(params.fm.probability_map_method, 'voronoi')
+	% TODO asaf - for each frame, take voronoi cell, fit gmm distribution and recieve mu's and covaraiance.
+	% then, take the maximum likelihood estimator(max n over f_n(class | sample)) for each pixel in the cell.
+end
 if strcmp(params.fm.probability_map_method, 'kde')
-	% TODO asaf - find out from Assaf what is the parameter 'u'. consider changing to the "super-fast kde" found on file exchange.
+	% TODO amit - find out from Assaf what is the parameter 'u'. consider changing to the "super-fast kde" found on file exchange.
 
 	% -------------------------------------------------
 	% code referenced from:
