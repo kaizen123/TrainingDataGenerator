@@ -28,8 +28,8 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
             intensity_values{n,m}      = frame(mask == m);% crop the current frame according to the voronoi mask
             intensity_values{n,m}      = intensity_values{n,m}(intensity_values{n,m}>1); %
             dist_object{n,m}           = fitgmdist(intensity_values{n,m}, 3);
-            dist_frame{n}(mask==m)     = pdf(dist_object{n,m},frame(mask == m)); %gives very good prob spatial map!!
-            % TODO - finish the prob map
+            %density{n,m}              = pdf(dist_object{n,m}, params.fm.dens_x);
+            dist_frame{n}(mask==m)     = pdf(dist_object{n,m},frame(mask == m));
             
         end
     end

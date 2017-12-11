@@ -28,7 +28,7 @@ alpha = params.fm.probability_map_alpha;
 % use the results to calculate a probability function for the cells.
 frames_3d_matrix = cat(3, data.pp_frame{:});
 masks_3d_matrix  = cat(3, data.masks{:});
-[fg_density, bg_density] = TDGFgBgDistributions(frames_3d_matrix, masks_3d_matrix, params);
+[fg_density, bg_density] = TDGFgBgDistributions(frames_3d_matrix, masks_3d_matrix, params,data);
 gray_probability         = (alpha*fg_density) ./ (alpha*fg_density + (1-alpha)*bg_density);
 
 %% fast marching per frame
@@ -43,5 +43,4 @@ for n = 1 : params.num_of_frames
 	results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
 	% test - asaf
 end
-
 

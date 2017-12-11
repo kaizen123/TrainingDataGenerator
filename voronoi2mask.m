@@ -77,7 +77,7 @@ if size(x,1) < size(x,2)
     x = x';
 end
 
-if size(x,1) < size(x,2)
+if size(y,1) < size(y,2)  % asaf - i fixed the indexes to y 
     y = y';
 end
 
