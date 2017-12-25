@@ -21,62 +21,65 @@ if strcmp(params.fm.probability_map_method, 'gmm')
 end
 
 if strcmp(params.fm.probability_map_method, 'voronoi')
+    alpha = params.fm.probability_map_alpha;
     for n = 1:params.num_of_frames
-        tot_density{n} = zeros(length(params.fm.dens_x),1);
-        frame        = frames(:,:,n);
-        mask         = masks(:,:,n);
-        fg_tot_density{n} = zeros(length(params.fm.dens_x),1);
-        bg_tot_density{n} = zeros(length(params.fm.dens_x),1);
+        tot_density{n}       = zeros(length(params.fm.dens_x),1);
+        frame                = frames(:,:,n);
+        mask                 = masks(:,:,n);
+        tot_num_of_gaussians = params.voronoi.num_of_bg_gaussians+params.voronoi.num_of_fg_gaussians;
+        fg_tot_density{n}    = zeros(length(params.fm.dens_x),1);
+        bg_tot_density{n}    = zeros(length(params.fm.dens_x),1);
+        tot_abs_bg{n}        = [];
         for m = 1:size(data.seeds{n},1) 
-            intensity_values{n,m}           = frame(mask == m);% crop the current frame according to the voronoi mask
-            intensity_values{n,m}           = intensity_values{n,m}(intensity_values{n,m}>1); % vanishes all the absolute bg pixels
+            intensity_values{n,m}           = frame(mask == m); % crop the current frame according to the voronoi mask
             absolut_background{n,m}         = intensity_values{n,m}(intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
-            dist_object{n,m}                = fitgmdist(intensity_values{n,m},params.fm.foreground_n_gaussians+params.fm.background_n_gaussians);
-            %dist_density{n,m}               = pdf(dist_object{n,m}, params.fm.dens_x);
-            [bg_mu{n,m} index]              = min(dist_object{n,m}.mu); %isolate the min mu gaussian and assign to bg 
+            intensity_values{n,m}           = intensity_values{n,m}(intensity_values{n,m}>1); % vanishes all the absolute bg pixels
+            mirror_intensity_values{n,m}    = cat(1,-1*intensity_values{n,m}(end:-1:1),intensity_values{n,m}); % mirroring the cell to get symetric gmdist
+            % TODO - try the algorithm with the mirror_intensity_values. with
+            % basic try it doesnt worked so well. 
+            dist_object{n,m}                = fitgmdist(intensity_values{n,m},tot_num_of_gaussians);
+            temp = dist_object{n,m}.mu;
+            for i=1:params.voronoi.num_of_bg_gaussians %iterate over each gaussi
+                
+                [~, index(i)]              = min(temp); %isolate the min mu gaussians and assign to bg dist
+                temp(index(i)) = [];
+            end 
+            bg_mu{n,m}                      = dist_object{n,m}.mu(index);
             bg_sigma{n,m}                   = dist_object{n,m}.Sigma(index);
-            bg_weight{n,m}                  = dist_object{n,m}.ComponentProportion(index);
-            fg_mu{n,m}                      = dist_object{n,m}.mu;
-            fg_sigma{n,m}                   = dist_object{n,m}.Sigma;
-            fg_weights{n,m}                 = dist_object{n,m}.ComponentProportion;
-            fg_mu{n,m}(index)               = [];    % delete the bg parameters from the fg dist 
-            fg_sigma{n,m}(index)            = []; 
-            fg_weights{n,m}(index)          = [];
-            fg_weights{n,m} = fg_weights{n,m}/(sum(fg_weights{n,m})); % normalizing the fg weights
-            %bg_values{n,m}                 = intensity_values{n,m}(intensity_values{n,m}<(bg_mu{n,m}+bg_sigma{n,m}));
-            bg_dist_object{n,m}             = makedist('Normal','mu',bg_mu{n,m},'sigma',bg_sigma{n,m});
+            bg_weights{n,m}                 = dist_object{n,m}.ComponentProportion(index);
+            % TODO - try to make this part cleaner
+            temp                            = dist_object{n,m}.mu; % deleting the bg parts from the fg dist
+            temp(index)                     = [];
+            fg_mu{n,m}                      = temp;
+            temp                            = dist_object{n,m}.Sigma;
+            temp(index)                     = [];
+            fg_sigma{n,m}                   = temp;
+            temp                            = dist_object{n,m}.ComponentProportion;
+            temp(index)                     = [];
+            fg_weights{n,m}                 = temp;
+            bg_weights{n,m}                 = bg_weights{n,m}/(sum(bg_weights{n,m})); % normalizing the fg/bg weights
+            fg_weights{n,m}                 = fg_weights{n,m}/(sum(fg_weights{n,m}));  
+            bg_dist_object{n,m}             = gmdistribution(bg_mu{n,m},bg_sigma{n,m},bg_weights{n,m});
             bg_density{n,m}                 = pdf(bg_dist_object{n,m},params.fm.dens_x);
-            fg_density{n,m}                 = zeros(length(params.fm.dens_x),1);
-            for i=1:params.fm.foreground_n_gaussians    %iterate over each fg gaussian 
-                fg_dist_object{n,m,i}   = makedist('Normal','mu',fg_mu{n,m}(i),'sigma',fg_sigma{n,m}(i));
-                fg_density{n,m}         = fg_density{n,m}+fg_weights{n,m}(i)*pdf(fg_dist_object{n,m,i},params.fm.dens_x);
-            end
-               fg_density{n,m}          = fg_density{n,m}/(sum(fg_density{n,m})); %normalizing
-               
-               
-            %dist_frame{n}(mask==m)     = pdf(dist_object{n,m},frame(mask == m)); % gives very good spatial prob map
-           
-            fg_tot_density{n}         = fg_tot_density{n}+ fg_density{n,m};
-            bg_tot_density{n}         = bg_tot_density{n}+ bg_density{n,m};
-            
+            fg_dist_object{n,m}             = gmdistribution(fg_mu{n,m},fg_sigma{n,m},fg_weights{n,m});
+            fg_density{n,m}                 = pdf(fg_dist_object{n,m},params.fm.dens_x);                             
+            fg_tot_density{n}               = fg_tot_density{n}+ fg_density{n,m}; % suming the distributions over all cells in the frame 
+            bg_tot_density{n}               = bg_tot_density{n}+ bg_density{n,m};               
         end
-        %dist{n} = dip_histogram(dist_frame{n},length(params.fm.dens_x))
-        %tot_density{n} = tot_density{n}/(sum(tot_density{n}));
-        %for i = 1:length(params.fm.dens_x)
-          %  prob{n}(i) = sum(tot_density{n}(1:i));
-        %end 
-          fg_tot_density{n} =  fg_tot_density{n}/(sum( fg_tot_density{n}));
-          bg_tot_density{n} =  bg_tot_density{n}/(sum( bg_tot_density{n}));
-    end
-   
+        fg_tot_density{n}             =  fg_tot_density{n}/(sum( fg_tot_density{n}));  % normalizing
+        bg_tot_density{n}             =  bg_tot_density{n}/(sum( bg_tot_density{n}));
+        %gray_probability{n}           = (alpha*fg_tot_density{n}) ./ (alpha*fg_tot_density{n} + (1-alpha)*bg_tot_density{n});
+    end  
 end
 
+% TODO:
+% only for temp convinience , need to adjust the fm to work on each frame
+% seperatly and then output -  fg_density{n}, bg_density(n}
+disp('warning - the results may fit only for the first frame. for further information see TDGFgBgDistributions doc');
 fg_density = fg_tot_density{1};
 bg_density = bg_tot_density{1};
     
-	% TODO asaf - for each frame, take voronoi cell, fit gmm distribution and recieve mu's and covaraiance.
-	% then, take the maximum likelihood estimator(max n over f_n(class | sample)) for each pixel in the cell.
-
+	
 if strcmp(params.fm.probability_map_method, 'kde')
 	% TODO amit - find out from Assaf what is the parameter 'u'. consider changing to the "super-fast kde" found on file exchange.
 
@@ -101,3 +104,4 @@ if strcmp(params.fm.probability_map_method, 'kde')
 
 end
 end
+

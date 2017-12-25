@@ -30,6 +30,9 @@ if strcmp(source_type, 'script')
 		params.pp.median_filter.enable      = true;
 		params.pp.median_filter.size        = [3 3];
 		
+        % Voronoi parameters
+        params.voronoi.num_of_bg_gaussians = 2;
+        params.voronoi.num_of_fg_gaussians = 2;
 		% FastMarching parameters
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
