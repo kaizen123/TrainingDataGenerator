@@ -38,7 +38,7 @@ for n = 1 : params.num_of_frames
          data.features{n}.gray_probability_map = zeros(size(I));
          for m=1:size(data.seeds{n},1)
              crop_I{m} = I(data.masks{n}==m);
-             data.features{n}.gray_probability_map(data.masks{n}==m) = gray_probability{n,m}(round(crop_I{m}) + 1);
+             data.features{n}.gray_probability_map(crop_I{m}) = gray_probability{n,m}(round(crop_I{m}) + 1);
          end
      end
 	if size(data.seeds{n},1) ~= params.cell_count_per_frame(n)
