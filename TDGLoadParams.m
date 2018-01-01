@@ -18,18 +18,18 @@ params.cell_dataset = cell_dataset;
 if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
-		params.otsu_th_fix                  = 0.027;
+		params.th 			                = 0.012;
 		params.num_of_frames                = 2;
 		params.cell_count_per_frame         = [9 9];
-		params.min_cell_size                = 100;
 		params.convex_cell_shapes           = false;
-		params.crop_size                    = [150 150];
+		params.crop_size                    = [250 250];
 		% PreProcessing parameters
 		params.pp.remove_bg_lighting.enable = true;
 		params.pp.remove_bg_lighting.sigma  = 100;
 		params.pp.median_filter.enable      = true;
 		params.pp.median_filter.size        = [3 3];
 		params.pp.gaussian_filter.enable    = true;
+        params.pp.gaussian_filter.sigma     = 3.5; 
 		
         % Voronoi parameters
         params.voronoi.num_of_bg_gaussians = 1;
@@ -38,7 +38,7 @@ if strcmp(source_type, 'script')
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
 		params.fm.q = 2; % std power factor in the inverse gradient
-		params.fm.probability_map_method 	= 'gmm';
+		params.fm.probability_map_method 	= 'kde';
 		params.fm.probability_map_alpha 	= 0.5;
 		if strcmp(params.fm.probability_map_method,'gmm')||strcmp(params.fm.probability_map_method,'voronoi')	 
 			params.fm.foreground_n_gaussians = 2;
