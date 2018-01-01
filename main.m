@@ -35,11 +35,13 @@ for n = 1 : params.num_of_frames
 	I = data.pp_frame{n};
      if strcmp(params.fm.probability_map_method,'voronoi') % case of voronoi
          data.features{n}.gray_probability_map = zeros(size(I));
-         for m=1:size(data.seeds{n},1)
-             crop_I{m} = I(data.masks{n}==m);
-             data.features{n}.gray_probability_map(data.masks{n}==m) = gray_probability{n,m}(round(crop_I{m}) + 1);
+         voronoi_crop = cell(m,1);
+         for m = 1:size(data.seeds{n},1)
+             voronoi_crop{m} = I(data.masks{n}==m);
+             data.features{n}.gray_probability_map(data.masks{n}==m) = gray_probability{n,m}(round(voronoi_crop{m}) + 1);
          end
-     else data.features{n}.gray_probability_map = gray_probability(round(I)+1); % case of gmm or kde 
+     else
+     	data.features{n}.gray_probability_map = gray_probability(round(I)+1); % case of gmm or kde 
      end
      
 	if size(data.seeds{n},1) ~= params.cell_count_per_frame(n)
@@ -47,5 +49,23 @@ for n = 1 : params.num_of_frames
 	end
 	results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
 end
+
+% for n = 1 : params.num_of_frames
+% 	debug.index = n;
+% 	seg = results.seg{n};
+% 	ground_truth = data.ground_truth{n};
+% 	seeds = data.seeds{n};
+% 	for m = 1:size(data.seeds{n},1)
+% 		gt_label = ground_truth(data.seeds{n}(m,2), data.seeds{n}(m,1)) % TODO amanor - check if x and y are not switched
+% 		seg_label = seg(data.seeds{n}(m,2), data.seeds{n}(m,1)) % TODO amanor - check if x and y are not switched
+% 		gt_mask = zeros(size(ground_truth));
+% 		gt_mask(ground_truth == gt_label) = 1;
+% 		seg_mask = zeros(size(seg));
+% 		seg_mask(seg == seg_label) = 1;
+% 		cell_intersection = seg_mask & gt_mask;
+% 		cell_union = seg_mask | gt_mask;
+% 		cell_intersection = sum(cell_intersection(:));
+% 		cell_union = sum(cell_union(:));
+% 		jaccard = cell_intersection / cell_union;
 
 

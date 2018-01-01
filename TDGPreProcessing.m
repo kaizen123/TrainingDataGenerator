@@ -13,4 +13,6 @@ end
 if params.pp.median_filter.enable
 	pp_frame = medfilt2(pp_frame,params.pp.median_filter.size);
 end
+if params.pp.gaussian_filter.enable
+	pp_frame = imgaussfilt(pp_frame);
 end
