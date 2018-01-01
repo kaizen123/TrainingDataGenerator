@@ -32,12 +32,10 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
         for m = 1:size(data.seeds{n},1) 
            
             pre_intensity_values{n,m}       = frame(mask == m); % crop the current frame according to the voronoi mask
-            pre_intensity_values{n,m}(pre_intensity_values{n,m}==0) = randi([1 10],size( pre_intensity_values{n,m}(pre_intensity_values{n,m}==0)));
+            pre_intensity_values{n,m}(pre_intensity_values{n,m}==0) = randi([0 1],size( pre_intensity_values{n,m}(pre_intensity_values{n,m}==0))); % gives random values to the zero pixels for Gmm convergence
             absolut_background{n,m}         = pre_intensity_values{n,m}(pre_intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
             %intensity_values{n,m}           = pre_intensity_values{n,m}(pre_intensity_values{n,m}>1); % vanishes all the absolute bg pixels          
-            %mirror_intensity_values{n,m}    = cat(1,-1*intensity_values{n,m}(end:-1:1),intensity_values{n,m}); % mirroring the cell to get symetric gmdist
-            % TODO - try the algorithm with the mirror_intensity_values. with
-            % basic try it doesnt worked so well. 
+            %mirror_intensity_values{n,m}    = cat(1,-1*intensity_values{n,m}(end:-1:1),intensity_values{n,m}); % mirroring the cell to get symetric gmdist 
             dist_object{n,m}                = fitgmdist(pre_intensity_values{n,m},tot_num_of_gaussians,'Options',statset('MaxIter',1000));
             dist_values{n,m}                = pdf(dist_object{n,m},params.fm.dens_x);
             [~ , indexs]                    = sort(dist_object{n,m}.mu); % take the minimal mu's to be the bg dist
@@ -58,25 +56,25 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
             gray_probability{n,m}           = (alpha*fg_density{n,m}) ./ (alpha*fg_density{n,m} + (1-alpha)*bg_density{n,m}); 
             [~ ,min_index]                  = min( gray_probability{n,m} );
             gray_probability{n,m}(1:min_index)   = 0;
-            %%%% debug section %%%
-            if (n==1&& m==1)  
-            figure
-            subplot(1,4,1)
-            hist(pre_intensity_values{n,m},1000)
-            grid on
-            title('hist with no zeros')
-            subplot(1,4,2)
-            hist(pre_intensity_values{n,m},1000)
-            grid on
-            title('hist with zeros')
-            subplot(1,4,3)
-            plot(dist_values{n,m})
-            title('dist_values')
-            grid on
-            subplot(1,4,4)
-            imshow(frame,[])
-            end 
-            %%%%%%%%%
+             %%%% debug section %%%
+%             if (n==1&& m==1)  
+%             figure
+%             subplot(1,4,1)
+%             hist(pre_intensity_values{n,m},1000)
+%             grid on
+%             title('hist with no zeros')
+%             subplot(1,4,2)
+%             hist(pre_intensity_values{n,m},1000)
+%             grid on
+%             title('hist with zeros')
+%             subplot(1,4,3)
+%             plot(dist_values{n,m})
+%             title('dist_values')
+%             grid on
+%             subplot(1,4,4)
+%             imshow(frame,[])
+%             end 
+%             %%%%%%%%%
         end
     end  
 end

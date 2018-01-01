@@ -12,6 +12,7 @@ user_input	   = false;
 params         = TDGLoadParams('script', cell_dataset);
 [data, params] = TDGLoadData('script', params);
 N = params.num_of_frames;
+
 %% frames preprocessing and feature extraction
 for n = 1 : N
 	debug.index = n;
@@ -26,8 +27,10 @@ for n = 1 : N
 		data.masks{n} = data.features{n}.voronoi_mask;
 	else
 		data.masks{n} = data.features{n}.otsu;
-	end
+    end
+    %data.seeds{n} = data.seeds{n}(randperm(length(data.seeds{n})));
 end
+
 %% intensity distribution calculation for all frames together
 alpha = params.fm.probability_map_alpha;
 % calculate the fg (cells) and bg density functions based on using an unsupervised learning algorithm.
@@ -47,12 +50,12 @@ for n = 1 : N
 	M = size(data.seeds{n},1);
 	I = data.pp_frame{n};
      if strcmp(params.fm.probability_map_method,'voronoi') % case of voronoi
-     	data.features{n}.gray_probability_map = zeros(size(I));
-     	voronoi_crop = cell(M,1);
-     	for m = 1:M
-     		voronoi_crop{m} = I(data.masks{n}==m);
-     		data.features{n}.gray_probability_map(data.masks{n}==m) = gray_probability{n,m}(round(voronoi_crop{m}) + 1);
-     	end
+         data.features{n}.gray_probability_map = zeros(size(I));
+         voronoi_crop = cell(M,1);
+         for m = 1:M
+             voronoi_crop{m} = I(data.masks{n}==m);
+             data.features{n}.gray_probability_map(data.masks{n}==m) = gray_probability{n,m}(round(voronoi_crop{m}) + 1);
+         end
      else
      	data.features{n}.gray_probability_map = gray_probability(round(I)+1); % case of gmm or kde 
      end
