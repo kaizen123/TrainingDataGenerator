@@ -31,13 +31,13 @@ if strcmp(source_type, 'script')
 		params.pp.median_filter.size        = [3 3];
 		
         % Voronoi parameters
-        params.voronoi.num_of_bg_gaussians = 1;
-        params.voronoi.num_of_fg_gaussians = 2;
+        params.voronoi.num_of_bg_gaussians = 2;
+        params.voronoi.num_of_fg_gaussians = 4;
 		% FastMarching parameters
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
 		params.fm.q = 2; % std power factor in the inverse gradient
-		params.fm.probability_map_method 	= 'gmm';
+		params.fm.probability_map_method 	= 'voronoi';
 		params.fm.probability_map_alpha 	= 0.5;
 		if strcmp(params.fm.probability_map_method,'gmm')||strcmp(params.fm.probability_map_method,'voronoi')	 
 			params.fm.foreground_n_gaussians = 2;

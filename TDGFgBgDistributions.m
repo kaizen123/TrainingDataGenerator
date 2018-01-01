@@ -30,9 +30,10 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
         mask                 = masks(:,:,n);
         tot_num_of_gaussians = params.voronoi.num_of_bg_gaussians+params.voronoi.num_of_fg_gaussians;
         for m = 1:size(data.seeds{n},1) 
-            intensity_values{n,m}           = frame(mask == m); % crop the current frame according to the voronoi mask
-            absolut_background{n,m}         = intensity_values{n,m}(intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
-            intensity_values{n,m}           = intensity_values{n,m}(intensity_values{n,m}>1); % vanishes all the absolute bg pixels
+           
+            pre_intensity_values{n,m}       = frame(mask == m); % crop the current frame according to the voronoi mask
+            absolut_background{n,m}         = pre_intensity_values{n,m}(pre_intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
+            intensity_values{n,m}           = pre_intensity_values{n,m}(pre_intensity_values{n,m}>1); % vanishes all the absolute bg pixels          
             mirror_intensity_values{n,m}    = cat(1,-1*intensity_values{n,m}(end:-1:1),intensity_values{n,m}); % mirroring the cell to get symetric gmdist
             % TODO - try the algorithm with the mirror_intensity_values. with
             % basic try it doesnt worked so well. 
@@ -54,8 +55,25 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
             fg_dist_object{n,m}             = gmdistribution(fg_mu{n,m},fg_sigma{n,m},fg_weights{n,m});
             fg_density{n,m}                 = pdf(fg_dist_object{n,m},params.fm.dens_x);                             
             gray_probability{n,m}           = (alpha*fg_density{n,m}) ./ (alpha*fg_density{n,m} + (1-alpha)*bg_density{n,m}); 
-            %[~ ,min_index]                  = min( gray_probability{n,m} );
-            %gray_probability{n,m}(1:min_index)   = 0;
+            [~ ,min_index]                  = min( gray_probability{n,m} );
+            gray_probability{n,m}(1:min_index)   = 0;
+            %%%% debug section %%%
+            if (n==1&& m==1)  
+            figure
+            subplot(1,3,1)
+            hist(intensity_values{n,m},1000)
+            grid on
+            title('hist with zeros')
+            subplot(1,3,2)
+            hist(intensity_values{n,m},1000)
+            grid on
+            title('hist with zeros')
+            subplot(1,3,3)
+            plot(dist_values{n,m})
+            title('dist_values')
+            grid on
+            end 
+            %%%%%%%%%
         end
     end  
 end
