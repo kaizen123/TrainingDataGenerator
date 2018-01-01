@@ -23,17 +23,17 @@ if strcmp(source_type, 'script')
 		params.cell_count_per_frame         = [9 9];
 		params.min_cell_size                = 100;
 		params.convex_cell_shapes           = false;
-		params.crop_size                    = [150 150];
+		params.crop_size                    = [200 200];
 		% PreProcessing parameters
 		params.pp.remove_bg_lighting.enable = true;
 		params.pp.remove_bg_lighting.sigma  = 100;
 		params.pp.median_filter.enable      = true;
 		params.pp.median_filter.size        = [3 3];
-		params.pp.gaussian_filter.enable    = true;
+		params.pp.gaussian_filter.enable    = false;
 		
         % Voronoi parameters
-        params.voronoi.num_of_bg_gaussians = 2;
-        params.voronoi.num_of_fg_gaussians = 4;
+        params.voronoi.num_of_bg_gaussians = 7;
+        params.voronoi.num_of_fg_gaussians = 1;
 		% FastMarching parameters
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
