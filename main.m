@@ -1,6 +1,6 @@
 % initialize debug and test mode
 % cd /Users/asafmanor/Documents/GitHub/TrainingDataGenerator
-clear; clc; close all;
+clear; clc;
 global debug;
 debug.enable = true;
 %% primary parameters - dataset, test method, debug etc.
@@ -61,6 +61,10 @@ for n = 1 : N
      	warning('Number of seeds is not equal to number of cells in frame %d', n);
      end
      results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
+     figure;
+     subplot(1,2,1); imagesc(results.seg{n}); title(sprintf('Automatic Segmentation, method = %s', params.fm.probability_map_method));
+     subplot(1,2,2); imagesc(data.ground_truth{n}); title('Manual Segmentation');
+
  end
 %% results - move to new function
 

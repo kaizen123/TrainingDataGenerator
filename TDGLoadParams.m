@@ -38,9 +38,9 @@ if strcmp(source_type, 'script')
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
 		params.fm.q = 2; % std power factor in the inverse gradient
-		params.fm.probability_map_method 	= 'kde';
+		params.fm.probability_map_method 	= 'voronoi';
 		params.fm.probability_map_alpha 	= 0.5;
-		if strcmp(params.fm.probability_map_method,'gmm')||strcmp(params.fm.probability_map_method,'voronoi')	 
+		if strcmp(params.fm.probability_map_method,'gmm')	 
 			params.fm.foreground_n_gaussians = 2;
 			params.fm.background_n_gaussians = 1;
 		end

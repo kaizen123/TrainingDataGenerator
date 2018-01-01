@@ -51,8 +51,8 @@ end
 thr                                 = 1e-8; % threshold for background impose ( can get any value in range [0 1e-10] with no difference in results)  
 [~, seg]                            = max(aposteriori_prob,[],3);
 seg(all(aposteriori_prob<thr,3))    = 1;    % impose background in case that all cells probability ~0 
-figure;
-imagesc(seg);
+%figure;
+%imagesc(seg);
 
 end
 
