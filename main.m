@@ -15,7 +15,6 @@ for n = 1 : params.num_of_frames
 	data.pp_frame{n} = TDGPreProcessing(data.loaded_frame{n}, params);
 	data.seeds{n}    = TDGUserInput(data.loaded_frame{n}, params, n);
 	data.features{n} = TDGExtractFeatures('frame', data.pp_frame{n}, params, data.seeds{n});
-	 % TODO asaf - remove data copy, decide on one implementation
 	if strcmp(params.fm.probability_map_method,'voronoi')
 		data.masks{n} = data.features{n}.voronoi_mask;
 	else
@@ -34,13 +33,15 @@ masks_3d_matrix  = cat(3, data.masks{:});
 for n = 1 : params.num_of_frames
 	debug.index = n;
 	I = data.pp_frame{n};
-     if strcmp(params.fm.probability_map_method,'voronoi')
+     if strcmp(params.fm.probability_map_method,'voronoi') % case of voronoi
          data.features{n}.gray_probability_map = zeros(size(I));
          for m=1:size(data.seeds{n},1)
              crop_I{m} = I(data.masks{n}==m);
              data.features{n}.gray_probability_map(data.masks{n}==m) = gray_probability{n,m}(round(crop_I{m}) + 1);
          end
+     else data.features{n}.gray_probability_map = gray_probability(round(I)+1); % case of gmm or kde 
      end
+     
 	if size(data.seeds{n},1) ~= params.cell_count_per_frame(n)
 		warning('Number of seeds is not equal to number of cells in frame %d', n);
 	end
