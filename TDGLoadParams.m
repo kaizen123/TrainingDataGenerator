@@ -29,7 +29,6 @@ if strcmp(source_type, 'script')
 		params.pp.median_filter.enable      = true;
 		params.pp.median_filter.size        = [3 3];
 		params.pp.gaussian_filter.enable    = true;
-        params.pp.gaussian_filter.sigma     = 3.5; 
 		
         % Voronoi parameters
         params.voronoi.num_of_bg_gaussians = 4;
@@ -38,7 +37,7 @@ if strcmp(source_type, 'script')
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
 		params.fm.q = 2; % std power factor in the inverse gradient
-		params.fm.probability_map_method 	= 'kde';
+		params.fm.probability_map_method 	= 'voronoi';
 		params.fm.probability_map_alpha 	= 0.5;
 		if strcmp(params.fm.probability_map_method,'gmm')||strcmp(params.fm.probability_map_method,'voronoi')	 
 			params.fm.foreground_n_gaussians = 2;
