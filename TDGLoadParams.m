@@ -32,8 +32,8 @@ if strcmp(source_type, 'script')
         params.pp.gaussian_filter.sigma     = 3.5; 
 		
         % Voronoi parameters
-        params.voronoi.num_of_bg_gaussians = 1;
-        params.voronoi.num_of_fg_gaussians = 2;
+        params.voronoi.num_of_bg_gaussians = 4;
+        params.voronoi.num_of_fg_gaussians = 1;
 		% FastMarching parameters
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
