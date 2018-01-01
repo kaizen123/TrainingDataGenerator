@@ -28,9 +28,10 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
         tot_density{n}       = zeros(length(params.fm.dens_x),1);
         frame                = frames(:,:,n);
         mask                 = masks(:,:,n);
+        voronoi_frame        = zeros(size(frame));
         tot_num_of_gaussians = params.voronoi.num_of_bg_gaussians+params.voronoi.num_of_fg_gaussians;
         for m = 1:size(data.seeds{n},1) 
-           
+            voronoi_frame(mask==m)          = m;
             pre_intensity_values{n,m}       = frame(mask == m); % crop the current frame according to the voronoi mask
             pre_intensity_values{n,m}(pre_intensity_values{n,m}==0) = randi([0 1],size( pre_intensity_values{n,m}(pre_intensity_values{n,m}==0))); % gives random values to the zero pixels for Gmm convergence
             absolut_background{n,m}         = pre_intensity_values{n,m}(pre_intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
@@ -54,8 +55,8 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
             fg_dist_object{n,m}             = gmdistribution(fg_mu{n,m},fg_sigma{n,m},fg_weights{n,m});
             fg_density{n,m}                 = pdf(fg_dist_object{n,m},params.fm.dens_x);                             
             gray_probability{n,m}           = (alpha*fg_density{n,m}) ./ (alpha*fg_density{n,m} + (1-alpha)*bg_density{n,m}); 
-            [~ ,min_index]                  = min( gray_probability{n,m} );
-            gray_probability{n,m}(1:min_index)   = 0;
+
+
              %%%% debug section %%%
 %             if (n==1&& m==1)  
 %             figure
@@ -75,7 +76,9 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
 %             imshow(frame,[])
 %             end 
 %             %%%%%%%%%
+
         end
+        imagesc(voronoi_frame+frame);
     end  
 end
 	
