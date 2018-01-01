@@ -29,6 +29,7 @@ if strcmp(source_type, 'script')
 		params.pp.median_filter.enable      = true;
 		params.pp.median_filter.size        = [3 3];
 		params.pp.gaussian_filter.enable    = true;
+        params.pp.gaussian_filter.sigma     = 3.5; 
 		
         % Voronoi parameters
         params.voronoi.num_of_bg_gaussians = 4;
