@@ -19,8 +19,8 @@ if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
 		params.th 			                = 0.012;
-		params.num_of_frames                = 2;
-		params.cell_count_per_frame         = [9 9];
+		params.num_of_frames                = 3;
+		%params.cell_count_per_frame         = [9 9 8 8 2 ];
 		params.convex_cell_shapes           = false;
 		params.crop_size                    = [250 250];
 		% PreProcessing parameters
@@ -49,8 +49,8 @@ if strcmp(source_type, 'script')
 end
 
 % parameters assertions
-assert(length(params.cell_count_per_frame) == params.num_of_frames,...
-	'Number of frames is not equal to the given cell count per frame');
+% assert(length(params.cell_count_per_frame) == params.num_of_frames,...
+% 	'Number of frames is not equal to the given cell count per frame');
 TDGStringAssertion(params.fm.probability_map_method,'probability map method','gmm','kde','voronoi');
 TDGStringAssertion(params.fm.distance,'fm distance method','diff','geodesic');
 end

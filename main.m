@@ -6,6 +6,7 @@ debug.enable = true;
 %% primary parameters - dataset, test method, debug etc.
 disp('Welcome to the Training Data Generator for HRM Cell images!')
 cell_dataset   = 'fluo-c2dl-msc';
+user_input	   = false;
 
 %% load data and parameters
 params         = TDGLoadParams('script', cell_dataset);
@@ -16,7 +17,11 @@ N = params.num_of_frames;
 for n = 1 : N
 	debug.index = n;
 	data.pp_frame{n} = TDGPreProcessing(data.loaded_frame{n}, params);
-	data.seeds{n}    = TDGUserInput(data.loaded_frame{n}, params, n);
+	if user_input
+		data.seeds{n} = TDGUserInput(data.loaded_frame{n}, params, n);
+	else
+		[data.seeds{n}, params] = TDGAutoInput(data.ground_truth{n}, params, n);
+	end
 	data.features{n} = TDGExtractFeatures('frame', data.pp_frame{n}, params, data.seeds{n});
 	if strcmp(params.fm.probability_map_method,'voronoi')
 		data.masks{n} = data.features{n}.voronoi_mask;
@@ -32,11 +37,12 @@ alpha = params.fm.probability_map_alpha;
 % use the results to calculate a probability function for the cells.
 frames_3d_matrix = cat(3, data.pp_frame{:});
 masks_3d_matrix  = cat(3, data.masks{:});
+% gray probability is cell in case of voronoi, or matrix in case of gmm/kde
 [gray_probability] = TDGFgBgDistributions(frames_3d_matrix, masks_3d_matrix, params,data);
 if debug.enable
-    if strcmp(params.fm.probability_map_method,'kde')
-        plot(gray_probability);
-    end
+	if strcmp(params.fm.probability_map_method,'kde')
+		plot(gray_probability);
+	end
 end
 %% fast marching per frame
 for n = 1 : N
@@ -54,12 +60,17 @@ for n = 1 : N
      	data.features{n}.gray_probability_map = gray_probability(round(I)+1); % case of gmm or kde 
      end
      
-	if M ~= params.cell_count_per_frame(n)
-		warning('Number of seeds is not equal to number of cells in frame %d', n);
-	end
-	results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
-end
+     if M ~= params.cell_count_per_frame(n)
+     	warning('Number of seeds is not equal to number of cells in frame %d', n);
+     end
+     results.seg{n} = TDGFastMarching(I, data.features{n}, data.seeds{n}, params);
+ end
 %% results - move to new function
+
+results.jaccard_all   = zeros(N,1);
+results.dice_all      = zeros(N,1);
+results.jaccard_valid = zeros(N,1);
+results.dice_valid    = zeros(N,1);
 for n = 1 : N
 	debug.index = n;
 	seg = results.seg{n};
@@ -83,10 +94,10 @@ for n = 1 : N
 		iou_valid(m) = (cell_intersection / sum(gt_mask(:))) >= 0.5 ; % checks if the segmentation is valid
 	end
 
-	results.jaccard_all{n} = mean(iou);
-	results.dice_all{n} = 2*results.jaccard_all{n} / (1 + results.jaccard_all{n});
-	results.jaccard_valid{n} = mean(iou.*iou_valid);
-	results.dice_valid{n} = 2*results.jaccard_valid{n} / (1 + results.jaccard_valid{n});
+	results.jaccard_all(n) = mean(iou);
+	results.dice_all(n) = 2*results.jaccard_all(n) / (1 + results.jaccard_all(n));
+	results.jaccard_valid(n) = mean(iou.*iou_valid);
+	results.dice_valid(n) = 2*results.jaccard_valid(n) / (1 + results.jaccard_valid(n));
 
 end
 disp('jaccard');
