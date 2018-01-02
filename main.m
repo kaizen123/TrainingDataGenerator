@@ -21,7 +21,9 @@ for n = 1 : N
 		data.seeds{n} = TDGUserInput(data.loaded_frame{n}, params, n);
 	else
 		[data.seeds{n}, params] = TDGAutoInput(data.ground_truth{n}, params, n);
-	end
+    end
+    figure; imshow(data.pp_frame{n},[]);
+    hold on; plot(data.seeds{n}(:,2), data.seeds{n}(:,1), 'r*');
 	data.features{n} = TDGExtractFeatures('frame', data.pp_frame{n}, params, data.seeds{n});
 	if strcmp(params.fm.probability_map_method,'voronoi')
 		data.masks{n} = data.features{n}.voronoi_mask;
