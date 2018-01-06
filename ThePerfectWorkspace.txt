@@ -9,7 +9,7 @@ Project Managment:
 	Trello (tasks)
 
 Version Control:
-	github + github-desktop
+	Git + GitHub + GitHub-Desktop
 
 Coding:
 	Text - Sublime Text. Packages are super important:
@@ -25,6 +25,8 @@ Coding:
 			need to add linter to path (/Application/MATLAB_R20***/bin/maci64/mlint)
 		1337 (Color Scheme)
 		Agila (UI theme)
+		Git - run git commands from sublime
+		GitGutter - compare against different commits
 	IDE - for debugging use MATLAB desktop / Pycharm
 	Ipython - for presenting the research, and interactive programming
 
