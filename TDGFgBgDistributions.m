@@ -1,5 +1,5 @@
 
-function [gray_probability] = TDGFgBgDistributions(frames, masks, params,data)
+function [gray_probability] = TDGFgBgDistributions(frames, masks, params, data)
 % returns the distribution objects for the foreground and background according to the method in params. 
 % INPUTS:	frames - d greyscale image, stacked as a 3D matrix
 %			masks - d logic matrices representing raw segmentation, 1 for foreground, 0 for background, stacked as a 3D matrix
@@ -34,7 +34,7 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
             voronoi_frame(mask==m)          = m;
             pre_intensity_values{n,m}       = frame(mask == m); % crop the current frame according to the voronoi mask
             pre_intensity_values{n,m}(pre_intensity_values{n,m}==0) = randi([0 1],size( pre_intensity_values{n,m}(pre_intensity_values{n,m}==0))); % gives random values to the zero pixels for Gmm convergence
-            absolut_background{n,m}         = pre_intensity_values{n,m}(pre_intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
+            absolute_background{n,m}         = pre_intensity_values{n,m}(pre_intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
             %intensity_values{n,m}           = pre_intensity_values{n,m}(pre_intensity_values{n,m}>1); % vanishes all the absolute bg pixels          
             %mirror_intensity_values{n,m}    = cat(1,-1*intensity_values{n,m}(end:-1:1),intensity_values{n,m}); % mirroring the cell to get symetric gmdist 
             dist_object{n,m}                = fitgmdist(pre_intensity_values{n,m},tot_num_of_gaussians,'Options',statset('MaxIter',1000));

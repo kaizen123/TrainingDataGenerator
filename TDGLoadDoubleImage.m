@@ -13,7 +13,6 @@ end
 if size(img,3) == 3
     img = rgb2gray(img);
 end
-% double_img = img / max(max(img));
 double_img = img;
 fprintf('%s was loaded\n', img_address);
 
