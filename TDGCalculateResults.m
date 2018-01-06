@@ -26,6 +26,7 @@ for m = 1:M
 end
 
 results.iou{frame_index} = iou;
+results.iou_valid_seeds{frame_index} = iou([seeds_info.inside_cell]);
 results.jaccard_all(frame_index) = mean(iou);
 results.dice_all(frame_index) = 2*results.jaccard_all(frame_index) / (1 + results.jaccard_all(frame_index));
 
