@@ -15,15 +15,16 @@ if strcmp(source_type, 'script')
 	switch params.cell_dataset
 	case 'fluo-c2dl-msc'
 		while(n <= params.num_of_frames && iter < 200)
-			%train_labels_string  = sprintf('Data/%s/TrainLabels/ManualSeg_%d.tif', params.cell_dataset, iter);
-			%train_data_string    = sprintf('Data/%s/TrainData/t00%d.tif', params.cell_dataset, iter-1);
 			train_data_string = fullfile('Fluo-C2DL-MSC','01',sprintf('t0%02d.tif', iter));
 			train_labels_string = fullfile('Fluo-C2DL-MSC','01_GT','SEG',sprintf('man_seg0%02d.tif', iter));
-			% load only if we have train labels for current
+			% load only if we have train labels for current, and more than 2 cells in the frame
 			if exist(train_labels_string,'file')
-				data.ground_truth{n} = TDGLoadDoubleImage(train_labels_string);
-				data.loaded_frame{n} = TDGLoadDoubleImage(train_data_string);
-				n = n + 1;
+				ground_truth = TDGLoadDoubleImage(train_labels_string);
+				if max(ground_truth(:)) > 2
+					data.ground_truth{n} = ground_truth;
+					data.loaded_frame{n} = TDGLoadDoubleImage(train_data_string);
+					n = n + 1;
+				end
 			end
 			iter = iter + 1;
 		end
