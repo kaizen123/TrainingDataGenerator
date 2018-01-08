@@ -1,12 +1,12 @@
 
 function [gray_probability] = TDGFgBgDistributions(frames, masks, params, data)
 % returns the distribution objects for the foreground and background according to the method in params. 
-% INPUTS:	frames - d greyscale image, stacked as a 3D matrix
-%			masks - d logic matrices representing raw segmentation, 1 for foreground, 0 for background, stacked as a 3D matrix
+% INPUTS:   frames - d greyscale image, stacked as a 3D matrix
+%           masks - d logic matrices representing raw segmentation, 1 for foreground, 0 for background, stacked as a 3D matrix
 %           params - parameters struct for the TDG
 %           data - data struct for the TDG 
-% OUTPUTS: 	fg_density - pdf of the intensity of the foreground (cells)
-%			bg_density - pdf of the intensity of the background
+% OUTPUTS:  fg_density - pdf of the intensity of the foreground (cells)
+%           bg_density - pdf of the intensity of the background
 
 assert(all(size(masks) == size(frames)), 'Size of masks and frames do not match');
 alpha = params.fm.probability_map_alpha;
