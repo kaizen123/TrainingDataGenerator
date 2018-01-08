@@ -27,7 +27,6 @@ for n = 1 : N
 end
 
 %% intensity distribution calculation for all frames together
-alpha = params.fm.probability_map_alpha;
 % calculate the fg (cells) and bg density functions based on unsupervised learning algorithm.
 % use the results to calculate a probability function for the cells.
 frames_3d_matrix = cat(3, data.pp_frame{:});

@@ -62,7 +62,7 @@ function [dist_map] = TDGDistanceMaps(speed_map, seeds, convex_cell_shapes)
 % 			seeds - [s*2] vector containing a pairs of coordinates from which the fast marching will start spreading
 %			-- note -- currently we call the function only with s=1, but it works with any positive integer.
 %			convex_cell_shapes - if our data is generally of convex shaped cells, we can normalize the distance with euclidean disfance.
-% OUTPUTS: 	dist_map --TODO--
+% OUTPUTS: 	dist_map - geodesic / geodesic normalized by euclidean distance.
 
 global debug;
 
