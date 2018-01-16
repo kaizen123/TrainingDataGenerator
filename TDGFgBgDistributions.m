@@ -1,12 +1,12 @@
 
 function [gray_probability] = TDGFgBgDistributions(frames, masks, params, data)
 % returns the distribution objects for the foreground and background according to the method in params. 
-% INPUTS:	frames - d greyscale image, stacked as a 3D matrix
-%			masks - d logic matrices representing raw segmentation, 1 for foreground, 0 for background, stacked as a 3D matrix
+% INPUTS:   frames - d greyscale image, stacked as a 3D matrix
+%           masks - d logic matrices representing raw segmentation, 1 for foreground, 0 for background, stacked as a 3D matrix
 %           params - parameters struct for the TDG
 %           data - data struct for the TDG 
-% OUTPUTS: 	fg_density - pdf of the intensity of the foreground (cells)
-%			bg_density - pdf of the intensity of the background
+% OUTPUTS:  fg_density - pdf of the intensity of the foreground (cells)
+%           bg_density - pdf of the intensity of the background
 
 assert(all(size(masks) == size(frames)), 'Size of masks and frames do not match');
 alpha = params.fm.probability_map_alpha;
@@ -108,3 +108,19 @@ if strcmp(params.fm.probability_map_method, 'kde')
 end
 end
 
+function dens =  FastKDE(data,x,varargin)
+%%
+if isempty(varargin)
+sig = 1.06*(numel(data))^(1/5);
+else
+    sig = varargin{1};
+end
+
+h = hist(data,x);
+f = -ceil(4*sig):ceil(4*sig);
+f = 1./(sig*sqrt(2*pi))*exp(-0.5*(f/sig).^2);
+f = f./sum(f);
+dens = conv(f,h); 
+dens= dens(ceil(4*sig)+1:end-ceil(4*sig));
+dens = dens./sum(dens);
+end
