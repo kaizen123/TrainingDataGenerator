@@ -1,4 +1,4 @@
-function [seeds, seed_info, ground_truth, params] = TDGAutoInput(ground_truth, params, frame_index)
+function [seeds, seeds_info, ground_truth, params] = TDGAutoInput(ground_truth, params, frame_index)
 % outputs auto seeds based on ground truth labels
 % seeds are produced in the center of mass location of each cell
 % with an added gaussian noise in the two axes
@@ -30,10 +30,10 @@ for label = 1:L % not including background
         var_cols = 0.05 * (bounding_box(2) + bounding_box(4)/2);
         var_rows = 0.05 * (bounding_box(1) + bounding_box(3)/2); % x + width(x)/2
         seeds(current_cell,:) = round([centroid(2) + sqrt(var_cols)*randn(), centroid(1) + sqrt(var_rows)*randn()]);
-        seed_info(current_cell).label = correct_label; % fixed label
-        seed_info(current_cell).inside_cell = ...
+        seeds_info(current_cell).label = correct_label; % fixed label
+        seeds_info(current_cell).inside_cell = ...
             (ground_truth(seeds(current_cell,1), seeds(current_cell,2)) == correct_label); % is the seed inside the cell?
-        if seed_info(current_cell).inside_cell == false && debug.enable
+        if seeds_info(current_cell).inside_cell == false && debug.enable
             warning('seed number %d is not inside the cell with label %d', current_cell, correct_label)
             fprintf('frame #%d : centroid location is:', frame_index)
             disp(centroid)

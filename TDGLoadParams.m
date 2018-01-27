@@ -19,7 +19,7 @@ if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
 		params.th 			                = 0.012;
-		params.num_of_frames                = 10;
+		params.num_of_frames                = 15;
 		%params.cell_count_per_frame         = [9 9 8 8 2 ];
 		params.convex_cell_shapes           = false;
 		params.crop_size                    = [250 250];
