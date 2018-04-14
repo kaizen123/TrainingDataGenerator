@@ -38,8 +38,8 @@ results.dice_all(frame_index) = 2*results.jaccard_all(frame_index) / (1 + result
 % else - we don't insert that score into the mean
 results.jaccard_valid_seeds(frame_index) = mean(iou([seeds_info.inside_cell]));
 results.dice_valid_seeds(frame_index) = 2*results.jaccard_valid_seeds(frame_index) / (1 + results.jaccard_valid_seeds(frame_index));
-results.mean_dice_valid_seeds = mean(dice_valid_seeds);
-results.median_dice_valid_seeds = median(dice_valid_seeds);
-results.std_dice_valid_seeds = std(dice_valid_seeds);
+results.mean_dice_valid_seeds = mean(results.dice_valid_seeds);
+results.median_dice_valid_seeds = median(results.dice_valid_seeds);
+results.std_dice_valid_seeds = std(results.dice_valid_seeds);
 end
 

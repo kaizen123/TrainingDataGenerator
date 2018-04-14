@@ -64,6 +64,9 @@ end
 for n = 1 : N
     debug.index = n;
     results = TDGCalculateResults(results.seg{n}, data.ground_truth{n}, data.seeds{n}, data.seeds_info{n}, results, n); 
+    
 end
+
+SaveData(data,params,results);
 
 end

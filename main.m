@@ -41,7 +41,7 @@ params{6}.fm.probability_map_method = 'voronoi';
 params{6}.voronoi.num_of_bg_gaussians = 2;
 params{6}.voronoi.num_of_fg_gaussians = 1;
 
-runs = 4:6;
+runs = 6:6;
 
 %% segmentation for each run
 for r = runs
@@ -59,6 +59,7 @@ for r = runs
 end
 
 %% results display , manipulation etc
+%{
 col=@(x)reshape(x,numel(x),1);
 boxplot2=@(C,varargin)boxplot(cell2mat(cellfun(col,col(C),'uni',0)),...
     cell2mat(arrayfun(@(I)I*ones(numel(C{I}),1),col(1:numel(C)),'uni',0)),varargin{:});
@@ -67,4 +68,5 @@ close all;
 for r = runs
     figure;
     boxplot2(results{r}.iou_valid_seeds);
-end
+end 
+%}
