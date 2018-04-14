@@ -90,13 +90,18 @@ for n=1:N
     seg_file    = uint16(results.seg{n});
     image_path  = (sprintf('%s/%i.tiff',image_dir,n));
     image_file  = uint16(data.loaded_frame{n});
-    size(seg_file)
     
     
+   
     imwrite(seg_file,seg_path,'tiff');
     imwrite(image_file,image_path,'tiff');
-    fprintf(jaccard_ranks_file,'"%d": %f,\n',n,results.jaccard_valid_seeds(n));
-    fprintf(dice_ranks_file,'"%d": %f,\n',n,results.dice_valid_seeds(n));
+    if n==N
+        fprintf(jaccard_ranks_file,'"%d": %f\n',n,results.jaccard_valid_seeds(n));
+        fprintf(dice_ranks_file,'"%d": %f\n',n,results.dice_valid_seeds(n));
+    else
+        fprintf(jaccard_ranks_file,'"%d": %f,\n',n,results.jaccard_valid_seeds(n));
+        fprintf(dice_ranks_file,'"%d": %f,\n',n,results.dice_valid_seeds(n));
+    end
 end
 fprintf(jaccard_ranks_file,'}');
 fprintf(dice_ranks_file,'}');
