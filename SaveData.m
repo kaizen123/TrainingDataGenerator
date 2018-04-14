@@ -82,6 +82,8 @@ end
 
 jaccard_ranks_file  = fopen(sprintf('%s/jaccard_ranks.json',dir_name),'w');
 dice_ranks_file     = fopen(sprintf('%s/dice_ranks.json',dir_name),'w');
+fprintf(jaccard_ranks_file,'{\n');
+fprintf(dice_ranks_file,'{\n');
 
 for n=1:N
     seg_path    = (sprintf('%s/%i.tiff',seg_dir,n));
@@ -96,6 +98,8 @@ for n=1:N
     fprintf(jaccard_ranks_file,'"%d": %f,\n',n,results.jaccard_valid_seeds(n));
     fprintf(dice_ranks_file,'"%d": %f,\n',n,results.dice_valid_seeds(n));
 end
+fprintf(jaccard_ranks_file,'}');
+fprintf(dice_ranks_file,'}');
 fclose(jaccard_ranks_file);
 fclose(dice_ranks_file);
 end
