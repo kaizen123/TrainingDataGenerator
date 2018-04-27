@@ -9,8 +9,44 @@ function [params] = TDGLoadParams(source_type, cell_dataset, pointer)
 %                    for 'struct' it is the struct of parameters
 % OUTPUTS:  params: parameters struct for the TDG
 
-TDGStringAssertion(source_type, 'parameters source', 'text', 'script', 'struct');
-params.cell_dataset = cell_dataset;
+TDGStringAssertion(source_type, 'parameters source', 'text', 'script', 'struct','script-shuffle');
+params.cell_dataset                             = cell_dataset;
+params.multiple_segmentation_per_frame_enable   = true;
+
+if params.multiple_segmentation_per_frame_enable
+    valid = false;
+    while ~valid
+        try 
+        temp = input('Please insert number of required segmentation per frame\n');
+        catch 
+        error('Required number of segmentation is not a valid number');
+        end
+        if temp==any(1:1000)
+            valid = true;
+            params.number_of_segmentation_per_frame = temp;
+        else 
+            error('Required number of segmentation is not a valid number');
+        end
+    end
+else 
+    params.number_of_segmentation_per_frame = 1;
+end
+
+valid = false;
+    while ~valid
+        try 
+        temp = input('Please insert number of required frames\n');
+        catch 
+        error('Required number of frame is not a valid number');
+        end
+        if temp==any(1:1000)
+            valid = true;
+            params.num_of_frames = temp;
+        else 
+            error('Required number of frames is not a valid number');
+        end
+    end
+        
 
 % load default parameters
 
@@ -19,7 +55,6 @@ if strcmp(source_type, 'script')
 	switch cell_dataset
 	case 'fluo-c2dl-msc'
 		params.th 			                = 0.012;
-		params.num_of_frames                = 1;
 		%params.cell_count_per_frame         = [9 9 8 8 2 ];
 		params.convex_cell_shapes           = false;
 		params.crop_size                    = [250 250];
@@ -46,6 +81,10 @@ if strcmp(source_type, 'script')
 		end
 	otherwise
 	end
+end
+
+if strcmp(source_type, 'script-shuffle')
+   params = TDGShuffleParams(params);
 end
 
 % parameters assertions

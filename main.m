@@ -9,8 +9,8 @@ cell_dataset = 'fluo-c2dl-msc';
 use_user_input = false;
 
 %% load data and parameters
-default_params         = TDGLoadParams('script', cell_dataset);
-[data, default_params] = TDGLoadData('script', default_params);
+default_params         = TDGLoadParams('script-shuffle', cell_dataset);
+[data, default_params] = TDGLoadData('script-shuffle', default_params);
 % here we should load non-default parameters and run to compare results
 params{1} = default_params;
 params{1}.fm.probability_map_method = 'kde';
@@ -19,7 +19,7 @@ params{1}.th = 0.015;
 params{2} = default_params;
 params{2}.fm.probability_map_method = 'voronoi';
 params{2}.voronoi.num_of_bg_gaussians = 3;
-params{2}.voronoi.num_of_fg_gaussians = 2;
+params{2}.voronoi.num_of_fg_gaussians = 2
 
 params{3} = default_params;
 params{3}.fm.probability_map_method = 'voronoi';

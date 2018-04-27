@@ -1,4 +1,4 @@
-function   SaveData(data,params,results)
+function   TDGSaveData(data,params,results)
 % Save images,segmentations and ranks to
 % ./Results/< data_set >/<dir_index>
 % INPUTS:   ...

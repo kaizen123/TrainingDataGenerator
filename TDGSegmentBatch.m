@@ -67,6 +67,6 @@ for n = 1 : N
     
 end
 
-SaveData(data,params,results);
+TDGSaveData(data,params,results);
 
 end
