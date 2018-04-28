@@ -17,11 +17,11 @@ if params.multiple_segmentation_per_frame_enable
     valid = false;
     while ~valid
         try 
-        temp = input('Please insert number of required segmentation per frame\n');
+            temp = input('Please insert number of required segmentation per frame\n');
         catch 
-        error('Required number of segmentation is not a valid number');
+            error('Required number of segmentation is not a valid number');
         end
-        if temp==any(1:1000)
+        if any(temp==(1:1000))
             valid = true;
             params.number_of_segmentation_per_frame = temp;
         else 
@@ -39,7 +39,7 @@ valid = false;
         catch 
         error('Required number of frame is not a valid number');
         end
-        if temp==any(1:1000)
+        if any(temp==(1:1000))
             valid = true;
             params.num_of_frames = temp;
         else 
@@ -67,7 +67,7 @@ if strcmp(source_type, 'script')
         params.pp.gaussian_filter.sigma     = 3; 
 		
         % Voronoi parameters
-        params.voronoi.num_of_bg_gaussians = 1;
+        params.voronoi.num_of_bg_gaussians  = 1;
         params.voronoi.num_of_fg_gaussians = 1;
 		% FastMarching parameters
 		params.fm.distance 					= 'diff';
@@ -84,12 +84,27 @@ if strcmp(source_type, 'script')
 end
 
 if strcmp(source_type, 'script-shuffle')
-   params = TDGShuffleParams(params);
+    
+   valid = false;
+    while ~valid
+        try 
+        temp = input('Please insert shuffle rate number (0-inf)\n');
+        catch 
+        error('Required number is not a valid number');
+        end
+        if isnumeric(temp) && temp>=0
+            valid = true;
+            shuffle_rate = temp;
+        else 
+            error('Required number is not a valid number');
+        end
+    end
+    params = TDGShuffleParams(params,shuffle_rate);
 end
 
 % parameters assertions
 % assert(length(params.cell_count_per_frame) == params.num_of_frames,...
 % 	'Number of frames is not equal to the given cell count per frame');
-TDGStringAssertion(params.fm.probability_map_method,'probability map method','gmm','kde','voronoi');
+%TDGStringAssertion(params.fm.probability_map_method,'probability map method','gmm','kde','voronoi');
 TDGStringAssertion(params.fm.distance,'fm distance method','diff','geodesic');
 end

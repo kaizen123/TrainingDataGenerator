@@ -1,4 +1,4 @@
-function [seg] = TDGFastMarching(frame, features, seeds, params)
+function [seg] = TDGFastMarching(frame, features, seeds, params,s)
 % returns the binary mask of the fast marching algorithm.
 % INPUTS:	frame - greyscale image
 %			features - feature struct for the current frame

@@ -1,4 +1,4 @@
-function [features] = TDGExtractFeatures(source_type, source, params, seeds)
+function [features] = TDGExtractFeatures(source_type, source, params, seeds,s)
 % extracts features from a frame or copies a different struct of features
 % code referenced from:
 % https://github.com/arbellea/CellTrackingAndSegmentationPublic/blob/master/calcFeatures.m
@@ -18,7 +18,7 @@ if strcmp(source_type, 'frame')
 	features.sobel_vertical   = imfilter(source, sobel_h.');
 	features.grad             = sqrt(features.sobel_horizontal.^2 + features.sobel_vertical.^2);
 	norm_source               = source/(2^16-1);
-	features.otsu             = im2bw(norm_source, params.th); %TODO asaf - this is a mistake. no real use of otsu!!
+	features.otsu             = im2bw(norm_source, params.th(s)); %TODO asaf - this is a mistake. no real use of otsu!!
 	features.voronoi_mask     = voronoi2mask(seeds(:,2), seeds(:,1), size(source));
 end
 end

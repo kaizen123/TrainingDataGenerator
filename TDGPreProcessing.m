@@ -1,4 +1,4 @@
-function [pp_frame] = TDGPreProcessing(frame, params)
+function [pp_frame] = TDGPreProcessing(frame, params,s)
 % preprocesses frames - removes noise, background ligthing
 % INPUTS:	frame: greyscale image [m*n]	
 %           params: parameters struct for the TDG
@@ -6,13 +6,13 @@ function [pp_frame] = TDGPreProcessing(frame, params)
 
 pp_frame = frame;
 
-if params.pp.remove_bg_lighting.enable
-	pp_frame = pp_frame - imgaussfilt(frame, params.pp.remove_bg_lighting.sigma);
+if params.pp.remove_bg_lighting.enable(s)
+	pp_frame = pp_frame - imgaussfilt(frame, params.pp.remove_bg_lighting.sigma(s));
 	pp_frame = max(0, pp_frame);
 end
-if params.pp.median_filter.enable
+if params.pp.median_filter.enable(s)
 	pp_frame = medfilt2(pp_frame,params.pp.median_filter.size);
 end
 if params.pp.gaussian_filter.enable
-	pp_frame = imgaussfilt(pp_frame, params.pp.gaussian_filter.sigma);
+	pp_frame = imgaussfilt(pp_frame, params.pp.gaussian_filter.sigma(s));
 end

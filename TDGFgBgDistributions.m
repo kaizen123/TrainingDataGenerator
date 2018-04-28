@@ -1,5 +1,5 @@
 
-function [gray_probability] = TDGFgBgDistributions(frames, masks, params, data)
+function [gray_probability] = TDGFgBgDistributions(frames, masks, params, data,s)
 % returns the distribution objects for the foreground and background according to the method in params. 
 % INPUTS:   frames - d greyscale image, stacked as a 3D matrix
 %           masks - d logic matrices representing raw segmentation, 1 for foreground, 0 for background, stacked as a 3D matrix
@@ -9,15 +9,15 @@ function [gray_probability] = TDGFgBgDistributions(frames, masks, params, data)
 %           bg_density - pdf of the intensity of the background
 
 assert(all(size(masks) == size(frames)), 'Size of masks and frames do not match');
-alpha = params.fm.probability_map_alpha;
+alpha = params.fm.probability_map_alpha(s);
 % TODO -  replicate the output in gmm and kde
 
-if strcmp(params.fm.probability_map_method, 'gmm')
+if strcmp(params.fm.probability_map_method(s), 'gmm')
 	fg_intensity_values = frames(masks > 0);
 	bg_intensity_values = frames(masks == 0);
-	fg_dist_object      = fitgmdist(fg_intensity_values, params.fm.foreground_n_gaussians);
+	fg_dist_object      = fitgmdist(fg_intensity_values', params.voronoi.num_of_fg_gaussians(s));
 	fg_density          = pdf(fg_dist_object, params.fm.dens_x);
-	bg_dist_object      = fitgmdist(bg_intensity_values, params.fm.background_n_gaussians);
+	bg_dist_object      = fitgmdist(bg_intensity_values', params.voronoi.num_of_bg_gaussians(s));
 	bg_density          = pdf(bg_dist_object, params.fm.dens_x);
     gray_probability    = (alpha*fg_density) ./ (alpha*fg_density + (1-alpha)*bg_density);
 	return;
@@ -29,7 +29,7 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
         frame                = frames(:,:,n);
         mask                 = masks(:,:,n);
         voronoi_frame        = zeros(size(frame));
-        tot_num_of_gaussians = params.voronoi.num_of_bg_gaussians+params.voronoi.num_of_fg_gaussians;
+        tot_num_of_gaussians = params.voronoi.num_of_bg_gaussians(s)+params.voronoi.num_of_fg_gaussians(s);
         for m = 1:size(data.seeds{n},1) 
             voronoi_frame(mask==m)          = m;
             pre_intensity_values{n,m}       = frame(mask == m); % crop the current frame according to the voronoi mask
@@ -40,8 +40,8 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
             dist_object{n,m}                = fitgmdist(pre_intensity_values{n,m},tot_num_of_gaussians,'Options',statset('MaxIter',1000));
             dist_values{n,m}                = pdf(dist_object{n,m},params.fm.dens_x);
             [~ , indexs]                    = sort(dist_object{n,m}.mu); % take the minimal mu's to be the bg dist
-            bg_index                        = indexs(1:params.voronoi.num_of_bg_gaussians);
-            fg_index                        = indexs(params.voronoi.num_of_bg_gaussians+1:tot_num_of_gaussians);
+            bg_index                        = indexs(1:params.voronoi.num_of_bg_gaussians(s));
+            fg_index                        = indexs(params.voronoi.num_of_bg_gaussians(s)+1:tot_num_of_gaussians);
             bg_mu{n,m}                      = dist_object{n,m}.mu(bg_index);
             bg_sigma{n,m}                   = dist_object{n,m}.Sigma(bg_index);
             bg_weights{n,m}                 = dist_object{n,m}.ComponentProportion(bg_index);
@@ -78,11 +78,11 @@ if strcmp(params.fm.probability_map_method, 'voronoi')
 %             %%%%%%%%%
 
         end
-        imagesc(voronoi_frame+frame);
+        %imagesc(voronoi_frame+frame);
     end  
 end
 	
-if strcmp(params.fm.probability_map_method, 'kde')
+if strcmp(params.fm.probability_map_method(s), 'kde')
 	% TODO amit - find out from Assaf what is the parameter 'u'. consider changing to the "super-fast kde" found on file exchange.
 
 	% -------------------------------------------------

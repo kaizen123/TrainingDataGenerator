@@ -73,7 +73,7 @@ Frozen   = zeros(size(F));
 % Free memory to store neighbours of the (segmented) region
 neg_free = 100000;
 neg_pos=0;
-if(Ed),
+if(Ed)
     neg_list = zeros(4,neg_free);
 else
     neg_list = zeros(3,neg_free);

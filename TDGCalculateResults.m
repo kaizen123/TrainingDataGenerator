@@ -1,5 +1,5 @@
 
-function [results] = TDGCalculateResults(seg, ground_truth, seeds, seeds_info, results, frame_index)
+function [results] = TDGCalculateResults(seg, ground_truth, seeds, seeds_info, frame_index,s)
 % returns the jaccard and dice results of the segmentation
 % INPUTS:	seg - automatic segmentation frame
 %           ground_truth - manual segmentation
@@ -25,10 +25,10 @@ for m = 1:M
     % iou_valid(m) = (cell_intersection / sum(gt_mask(:))) >= 0.5 ; % checks if the segmentation is valid
 end
 
-results.iou{frame_index} = iou;
-results.iou_valid_seeds{frame_index} = iou([seeds_info.inside_cell]);
-results.jaccard_all(frame_index) = mean(iou);
-results.dice_all(frame_index) = 2*results.jaccard_all(frame_index) / (1 + results.jaccard_all(frame_index));
+results.iou = iou;
+results.iou_valid_seeds= iou([seeds_info.inside_cell]);
+results.jaccard_all = mean(iou);
+results.dice_all = 2*results.jaccard_all / (1 + results.jaccard_all);
 
 % % valid results - at least 50% segmentation. else - we get 0 score
 % results.jaccard_valid(frame_index) = mean(iou.*iou_valid);
@@ -36,10 +36,10 @@ results.dice_all(frame_index) = 2*results.jaccard_all(frame_index) / (1 + result
 
 % valid seed segmentation - input seed was inside the cell according to the ground truth
 % else - we don't insert that score into the mean
-results.jaccard_valid_seeds(frame_index) = mean(iou([seeds_info.inside_cell]));
-results.dice_valid_seeds(frame_index) = 2*results.jaccard_valid_seeds(frame_index) / (1 + results.jaccard_valid_seeds(frame_index));
-results.mean_dice_valid_seeds = mean(results.dice_valid_seeds);
-results.median_dice_valid_seeds = median(results.dice_valid_seeds);
-results.std_dice_valid_seeds = std(results.dice_valid_seeds);
+results.jaccard_valid_seeds = mean(iou([seeds_info.inside_cell]));
+results.dice_valid_seeds = 2*results.jaccard_valid_seeds / (1 + results.jaccard_valid_seeds);
+%results.mean_dice_valid_seeds = mean(results.dice_valid_seeds,1);
+%results.median_dice_valid_seeds = median(results.dice_valid_seeds,1);
+%results.std_dice_valid_seeds = std(results.dice_valid_seeds,1);
 end
 

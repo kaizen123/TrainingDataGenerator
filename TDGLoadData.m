@@ -9,8 +9,8 @@ function [data, params] = TDGLoadData(source_type, params)
 %                    for 'struct' it is the struct of data
 % OUTPUTS:  data: data struct for the TDG
 
-assert(strcmp(source_type, 'script') | strcmp(source_type, 'struct'), 'source_type not supported');
-if strcmp(source_type, 'script')
+assert(strcmp(source_type, 'script') | strcmp(source_type, 'struct') |strcmp(source_type,'script-shuffle'), 'source_type not supported');
+if strcmp(source_type, 'script') || strcmp(source_type,'script-shuffle')
 	iter = 0;
 	n = 1;
 	switch params.cell_dataset
