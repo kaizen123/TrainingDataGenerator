@@ -8,10 +8,10 @@ N            = params.number_of_segmentation_per_frame;
 if shuffle_rate<0
     shuffle_rate = 0;
 end
-shuffle_factor  = 1 - 1/(1+sqrt(shuffle_rate));  
+shuffle_factor  = 1 - 1/(1+log(sqrt(shuffle_rate+1)));  
 random_numer    = [zeros(1,floor(shuffle_factor*N)) ones(1,N-floor(shuffle_factor*N))];
 random_logic    = logical(random_numer);
-frac_factor     = min([1/shuffle_rate 1e-2]); 
+frac_factor     = log10(sqrt(shuffle_factor+1)); 
 random_frac     = linspace(1 - frac_factor,1+frac_factor,N);
 method_dict     = ["voronoi","voronoi"];
 
