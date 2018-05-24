@@ -14,6 +14,8 @@ params.cell_dataset                             = cell_dataset;
 params.multiple_segmentation_per_frame_enable   = true;
 
 if params.multiple_segmentation_per_frame_enable
+    
+    params.local_dir_name = input(sprintf('Please enter data directory name in the format: Results/%s/<directory_name>\n',params.cell_dataset),'s');
     valid = false;
     while ~valid
         try 
@@ -35,13 +37,18 @@ end
 valid = false;
     while ~valid
         try 
-        temp = input('Please insert number of required frames\n');
+        temp = input('Please insert number of required frames (integer or "max")\n','s');
         catch 
         error('Required number of frame is not a valid number');
         end
-        if any(temp==(1:1000))
+        if length(str2num(temp))==1 && any(str2num(temp)==(1:1000))
             valid = true;
-            params.num_of_frames = temp;
+            params.num_of_frames = str2num(temp);
+        
+        elseif strcmp(temp,'max')
+                 valid = true;
+                 params.num_of_frames = 1e3 ;
+
         else 
             error('Required number of frames is not a valid number');
         end
@@ -53,7 +60,34 @@ valid = false;
 % load parameters per dataset (may override defaults)
 if strcmp(source_type, 'script')
 	switch cell_dataset
-	case 'fluo-c2dl-msc'
+	case 'Fluo-N2DH-SIM+'
+		params.th 			                = 0.012;
+		%params.cell_count_per_frame         = [9 9 8 8 2 ];
+		params.convex_cell_shapes           = false;
+		params.crop_size                    = [200 200];
+		% PreProcessing parameters
+		params.pp.remove_bg_lighting.enable = true;
+		params.pp.remove_bg_lighting.sigma  = 100;
+		params.pp.median_filter.enable      = true;
+		params.pp.median_filter.size        = [3 3];
+		params.pp.gaussian_filter.enable    = true;
+        params.pp.gaussian_filter.sigma     = 3; 
+		
+        % Voronoi parameters
+        params.voronoi.num_of_bg_gaussians  = 1;
+        params.voronoi.num_of_fg_gaussians  = 1;
+		% FastMarching parameters
+		params.fm.distance 					= 'diff';
+		params.fm.k = 5; % std multiplier factor in the inverse gradient
+		params.fm.q = 2; % std power factor in the inverse gradient
+		params.fm.probability_map_method 	= 'voronoi';
+		params.fm.probability_map_alpha 	= 0.5;
+		if strcmp(params.fm.probability_map_method,'gmm')	 
+			params.fm.foreground_n_gaussians = 2;
+			params.fm.background_n_gaussians = 1;
+        end
+        
+    case 'Fluo-C2DL-MSC'
 		params.th 			                = 0.012;
 		%params.cell_count_per_frame         = [9 9 8 8 2 ];
 		params.convex_cell_shapes           = false;
@@ -68,7 +102,7 @@ if strcmp(source_type, 'script')
 		
         % Voronoi parameters
         params.voronoi.num_of_bg_gaussians  = 1;
-        params.voronoi.num_of_fg_gaussians = 1;
+        params.voronoi.num_of_fg_gaussians  = 1;
 		% FastMarching parameters
 		params.fm.distance 					= 'diff';
 		params.fm.k = 5; % std multiplier factor in the inverse gradient
@@ -99,7 +133,7 @@ if strcmp(source_type, 'script-shuffle')
             error('Required number is not a valid number');
         end
     end
-    params = TDGShuffleParams(params,shuffle_rate);
+    params = TDGShuffleParams(params,shuffle_rate,false);
 end
 
 % parameters assertions

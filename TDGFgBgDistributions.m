@@ -15,22 +15,25 @@ alpha = params.fm.probability_map_alpha(s);
 if strcmp(params.fm.probability_map_method(s), 'gmm')
 	fg_intensity_values = frames(masks > 0);
 	bg_intensity_values = frames(masks == 0);
-	fg_dist_object      = fitgmdist(fg_intensity_values', params.voronoi.num_of_fg_gaussians(s));
+	fg_dist_object      = fitgmdist(fg_intensity_values, params.voronoi.num_of_fg_gaussians(s));
 	fg_density          = pdf(fg_dist_object, params.fm.dens_x);
-	bg_dist_object      = fitgmdist(bg_intensity_values', params.voronoi.num_of_bg_gaussians(s));
+	bg_dist_object      = fitgmdist(bg_intensity_values, params.voronoi.num_of_bg_gaussians(s));
 	bg_density          = pdf(bg_dist_object, params.fm.dens_x);
     gray_probability    = (alpha*fg_density) ./ (alpha*fg_density + (1-alpha)*bg_density);
 	return;
 end
 
-if strcmp(params.fm.probability_map_method, 'voronoi')
+if strcmp(params.fm.probability_map_method(s), 'voronoi')
     for n = 1:params.num_of_frames
         tot_density{n}       = zeros(length(params.fm.dens_x),1);
         frame                = frames(:,:,n);
         mask                 = masks(:,:,n);
         voronoi_frame        = zeros(size(frame));
         tot_num_of_gaussians = params.voronoi.num_of_bg_gaussians(s)+params.voronoi.num_of_fg_gaussians(s);
-        for m = 1:size(data.seeds{n},1) 
+        mask_indexes         = (unique(mask(:)))';
+        mask_indexes(mask_indexes==0) = [];
+         for m = mask_indexes
+        %for m = 1:size(data.seeds{n},1) 
             voronoi_frame(mask==m)          = m;
             pre_intensity_values{n,m}       = frame(mask == m); % crop the current frame according to the voronoi mask
             pre_intensity_values{n,m}(pre_intensity_values{n,m}==0) = randi([0 1],size( pre_intensity_values{n,m}(pre_intensity_values{n,m}==0))); % gives random values to the zero pixels for Gmm convergence

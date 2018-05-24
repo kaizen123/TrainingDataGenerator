@@ -1,8 +1,11 @@
-function   TDGSaveData(data,params,results)
+function   TDGSaveData(data,params,results,add_groundtruth)
 % Save images,segmentations and ranks to
 % ./Results/< data_set >/<dir_index>
 % INPUTS:   ...
 % OUTPUTS:  ...
+if nargin == 3
+    add_groundtruth = true;
+end
 max_directories         = 1000;
 data_set                = params.cell_dataset;
 current_folder          = pwd;
@@ -11,6 +14,10 @@ dir_content             = dir;
 dir_content             = {dir_content([dir_content.isdir]).name};
 N                       = params.num_of_frames;
 S                       = params.number_of_segmentation_per_frame;
+if add_groundtruth
+    S = S + 1;
+end
+
 flag = 1;
 for i=1:numel(dir_content)
     if (strcmp(dir_content{i},results_dir_name))
@@ -60,7 +67,7 @@ if ~params.multiple_segmentation_per_frame_enable
     end
     
 else 
-    dir_name = data_set_dir;
+    dir_name = strcat(data_set_dir,'/',params.local_dir_name);
 end
 
 image_dir       = sprintf('%s/image',dir_name);
@@ -92,8 +99,13 @@ for s = 1 : S
     end
 end 
 
-for s = 1 :S
-    
+for s = 1 :S 
+    if add_groundtruth
+        for n=1:N
+              results.seg{n,s+1} = data.ground_truth{n};
+        end
+    end
+          
     jaccard_ranks_file  = fopen(sprintf('%s/jaccard_ranks_%s.json',dir_name,num2str(s,'%03d')),'w');
     dice_ranks_file     = fopen(sprintf('%s/dice_ranks_%s.json',dir_name,num2str(s,'%03d')),'w');
     fprintf(jaccard_ranks_file,'{\n');
@@ -101,6 +113,7 @@ for s = 1 :S
     seg_dir             = strcat(dir_name,sprintf('/seg_%s',num2str(s,'%03d')));
 
     for n=1:N
+
         seg_path    = (sprintf('%s/%s.tiff',seg_dir,num2str(n,'%03d')));
         seg_file    = uint16(results.seg{n,s});
         if s==1
@@ -111,12 +124,23 @@ for s = 1 :S
         if s==1
             imwrite(image_file,image_path,'tiff');
         end
-        if n==N
-            fprintf(jaccard_ranks_file,'"%d": %f\n',n,results.ranks{n,s}.jaccard_valid_seeds);
-            fprintf(dice_ranks_file,'"%d": %f\n',n,results.ranks{n,s}.dice_valid_seeds);
+        if add_groundtruth && s==S 
+            if n==N
+                fprintf(jaccard_ranks_file,'"%d": 1\n',n);
+                fprintf(dice_ranks_file,'"%d": 1\n',n);
+            else
+                fprintf(jaccard_ranks_file,'"%d": 1,\n',n);
+                fprintf(dice_ranks_file,'"%d": 1,\n',n);
+            end
         else
-            fprintf(jaccard_ranks_file,'"%d": %f,\n',n,results.ranks{n,s}.jaccard_valid_seeds);
-            fprintf(dice_ranks_file,'"%d": %f,\n',n,results.ranks{n,s}.dice_valid_seeds);
+         
+            if n==N
+                fprintf(jaccard_ranks_file,'"%d": %f\n',n,results.ranks{n,s}.jaccard_valid_seeds);
+                fprintf(dice_ranks_file,'"%d": %f\n',n,results.ranks{n,s}.dice_valid_seeds);
+            else
+                fprintf(jaccard_ranks_file,'"%d": %f,\n',n,results.ranks{n,s}.jaccard_valid_seeds);
+                fprintf(dice_ranks_file,'"%d": %f,\n',n,results.ranks{n,s}.dice_valid_seeds);
+            end
         end
     end
     fprintf(jaccard_ranks_file,'}');

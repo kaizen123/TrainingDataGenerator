@@ -14,7 +14,38 @@ if strcmp(source_type, 'script') || strcmp(source_type,'script-shuffle')
 	iter = 0;
 	n = 1;
 	switch params.cell_dataset
-	case 'fluo-c2dl-msc'
+	case 'Fluo-N2DH-SIM+'
+		while(n <= params.num_of_frames && iter < 200)
+			train_data_string = fullfile('Fluo-N2DH-SIM+','02',sprintf('t0%02d.tif', iter));
+			train_labels_string = fullfile('Fluo-N2DH-SIM+','02_GT','SEG',sprintf('man_seg0%02d.tif', iter));
+			% load only if we have train labels for current, and more than 2 cells in the frame
+			if exist(train_labels_string,'file')
+				ground_truth = TDGLoadDoubleImage(train_labels_string);
+				if max(ground_truth(:)) > 2
+					data.ground_truth{n} = ground_truth;
+					data.loaded_frame{n} = TDGLoadDoubleImage(train_data_string);
+					n = n + 1;
+				end
+			end
+			iter = iter + 1;
+        end
+    case 'Fluo-N2DH-GOWT1'
+		while(n <= params.num_of_frames && iter < 200)
+			train_data_string = fullfile('Fluo-N2DH-GOWT1','01',sprintf('t0%02d.tif', iter));
+			train_labels_string = fullfile('Fluo-N2DH-GOWT1','01_GT','SEG',sprintf('man_seg0%02d.tif', iter));
+			% load only if we have train labels for current, and more than 2 cells in the frame
+			if exist(train_labels_string,'file')
+				ground_truth = TDGLoadDoubleImage(train_labels_string);
+				if length(unique(ground_truth(:))) > 3 
+					data.ground_truth{n} = ground_truth;
+					data.loaded_frame{n} = TDGLoadDoubleImage(train_data_string);
+					n = n + 1;
+				end
+			end
+			iter = iter + 1;
+        end
+        
+        case 'Fluo-C2DL-MSC'
 		while(n <= params.num_of_frames && iter < 200)
 			train_data_string = fullfile('Fluo-C2DL-MSC','01',sprintf('t0%02d.tif', iter));
 			train_labels_string = fullfile('Fluo-C2DL-MSC','01_GT','SEG',sprintf('man_seg0%02d.tif', iter));
@@ -28,7 +59,7 @@ if strcmp(source_type, 'script') || strcmp(source_type,'script-shuffle')
 				end
 			end
 			iter = iter + 1;
-		end
+        end
 	otherwise
 	end
 

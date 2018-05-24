@@ -1,7 +1,7 @@
 function [results] = TDGSegmentBatch(data, params, user_input)
 global debug;
+params.num_of_frames = min([params.num_of_frames length(data.loaded_frame)]);
 N = params.num_of_frames;
-N = length(data.loaded_frame);
 S = params.number_of_segmentation_per_frame;
 %% frames preprocessing and feature extraction
 
@@ -23,7 +23,7 @@ for n = 1 : N
             %subplot(1,2,2);
             %imshow(data.ground_truth{n},[]);
             %end   
-            data.features{n,s} = TDGExtractFeatures('frame', data.pp_frame{n}, params, data.seeds{n},s);
+            data.features{n,s} = TDGExtractFeatures('frame', data.pp_frame{n,s}, params, data.seeds{n},s);
             if strcmp(params.fm.probability_map_method, 'voronoi')
                 data.masks{n,s} = data.features{n,s}.voronoi_mask;
             else
@@ -60,7 +60,7 @@ for n = 1 : N
         warning('Number of seeds is not equal to number of cells in frame %d', n);
     end
     results.seg{n,s} = TDGFastMarching(I, data.features{n,s}, data.seeds{n}, params,s);
-    figure;
+    %figure;
     %subplot(1,2,1); imagesc(results.seg{n,s}); title(sprintf('Automatic Segmentation, method = %s',...
      %   params.fm.probability_map_method(s)));
     %subplot(1,2,2); imagesc(data.ground_truth{n}); title('Manual Segmentation');
@@ -78,6 +78,28 @@ for n = 1 : N
     end
 end
 
-TDGSaveData(data,params,results);
+%%% crop segmentation %%%
+
+crop = cell(N,S);
+for n = 1 : N
+    number_of_seeds = length(data.seeds{n});
+    for s = 1 : S
+        crop{n,s} = zeros([number_of_seeds params.crop_size]);
+        crop{n,s} = TDGCalculateComCrop(data,results.seg{n,s},params.crop_size,n);
+    end
+end
+
+
+        
+
+
+
+% this parameter determines whether to include ground truth in the
+% segmentation collection or not.
+save_data = true;
+if save_data 
+    add_groundtruth = true;
+    TDGSaveData(data,params,results,add_groundtruth);
+end
 
 end
