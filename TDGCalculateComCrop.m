@@ -1,17 +1,22 @@
-function [crop] =  TDGCalculateComCrop(data,seg,crop_size,n)
-    ground_truth    = data.ground_truth{n};
-    temp            = unique(ground_truth(:));
-    temp(temp==0)   = [];
-    L               = length(temp);
-    shape           = size(seg);
-    crop            = zeros([L crop_size]);
+function [crop,croped_ground_truth,croped_loaded_frame,shifted_COM] =  TDGCalculateComCrop(data,seg,crop_size,n)
+    ground_truth        = data.ground_truth{n};
+    temp                = unique(ground_truth(:));
+    temp(temp==0)       = [];
+    L                   = length(temp);
+    shape               = size(seg);  
+    crop                = zeros([L crop_size]);
+    croped_ground_truth = zeros([L crop_size]);
+    croped_loaded_frame = zeros([L crop_size]);
     
-    COM = zeros(L,2);
-    com = zeros(L,2);
+    COM                 = zeros(L,2);
+    com                 = zeros(L,2);
+    shifted_COM         = zeros(L,2);
     %%% debug %%%
+    %{
     figure
     imshow(seg,[])
     hold on
+    %}
     %%%%%%%%%%%%%
     for label = 1:L
         mask            = (ground_truth == temp(label));
@@ -25,50 +30,48 @@ function [crop] =  TDGCalculateComCrop(data,seg,crop_size,n)
         temp_com        = props.Centroid;
         COM(label,:)    = round(temp_com(1,:));
         com(label,:)    = COM(label,:);
-        valid_crop      = false;
-        while ~valid_crop
             
         % crop limits
         
-            tl = round(com(label,:) + ([-crop_size(1)/2 -crop_size(2)/2]));
-            tr = round(com(label,:) + ([crop_size(1)/2 -crop_size(2)/2]));
-            bl = round(com(label,:) + ([-crop_size(1)/2 crop_size(2)/2]));
-            br = round(com(label,:) + ([crop_size(1)/2 crop_size(2)/2]));
-            disp(label)
-            disp('br:\n')
-            disp(br)
-            disp('tl:\n')
-            disp(tl)
-
-            valid_crop = true;
-            
-            if tl(1)<1
-                com(label,1) = crop_size(1)/2 + 1;
-                valid_crop = false;
-                continue 
-            end
-            if tl(2)<1
-                com(label,2) = crop_size(2)/2 + 1 ;
-                valid_crop = false;
-                continue 
-            end
-            if br(1) > shape(1)
-                com(label,1) = shape(1) - crop_size(1)/2;
-                valid_crop = false;
-                continue
-            end
-            if br(2)>shape(2)
-                com(label,2) = shape(2) - crop_size(2)/2 ;
-                valid_crop = false; 
-                continue 
-            end
+        if com(label,1)<=crop_size(1)/2
+            com(label,1) = crop_size(1)/2 + 1;
         end
-
-    crop(label,:,:) = seg(com(label,1)-crop_size(1)/2:com(label,1)+crop_size(1)/2-1,...
-    com(label,2)-crop_size(2)/2:com(label,2)+crop_size(2)/2-1);
+        if com(label,1)>= shape(2) - crop_size(1)/2
+            com(label,1) = shape(2) - crop_size(1)/2;
+        end
+        
+        if com(label,2)<=crop_size(2)/2
+            com(label,2) = crop_size(2)/2 + 1;
+        end
+        if com(label,2)>= shape(1) - crop_size(2)/2
+            com(label,2) = shape(1) - crop_size(2)/2;
+        end
+        
+        
     
-    %%% debug %%%
 
+    crop(label,:,:)     = seg(com(label,2)-crop_size(1)/2:com(label,2)+crop_size(1)/2-1,...
+    com(label,1)-crop_size(2)/2:com(label,1)+crop_size(2)/2-1);
+    croped_ground_truth(label,:,:) = ground_truth(com(label,2)-crop_size(1)/2:com(label,2)+crop_size(1)/2-1,...
+    com(label,1)-crop_size(2)/2:com(label,1)+crop_size(2)/2-1);
+    croped_loaded_frame(label,:,:) = data.loaded_frame{n}(com(label,2)-crop_size(1)/2:com(label,2)+crop_size(1)/2-1,...
+    com(label,1)-crop_size(2)/2:com(label,1)+crop_size(2)/2-1);
+    
+    % calculate shifted orig COM
+    h  = crop_size(1);
+    w  = crop_size(2);
+    y1 = max(COM(label,1)-h/2,1);
+    y2 = min(COM(label,1)+h/2,shape(1));
+    x1 = max(COM(label,2)-w/2,1);
+    x2 = min(COM(label,2)+w/2,shape(2));
+    %[X,Y]   = meshgrid(x1:x2,y1:y2);
+    %crop_indices = sub2ind(shape,Y(:),X(:));    
+    shifted_COM(label,:) = [COM(label,1) - y1, COM(label,2) - x1];
+
+
+
+    %%% debug %%%
+    %{
     plot(com(label,1),com(label,2),'r*')
     hold on
     %plot(COM(label,1),COM(label,2),'b*')
@@ -78,9 +81,8 @@ function [crop] =  TDGCalculateComCrop(data,seg,crop_size,n)
     plot(com(label,1)+crop_size(1)/2-1,com(label,2)+crop_size(2)/2-1,'g*')
     hold on
     %disp(com(label,:))
+    %}
     end
-   
-    
 end
     
     

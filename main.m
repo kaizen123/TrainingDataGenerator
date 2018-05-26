@@ -14,14 +14,15 @@ params         = TDGLoadParams('script-shuffle', cell_dataset);
 
 %% segmentation 
 
-results = TDGSegmentBatch(data, params, use_user_input);
+results = TDGSegmentBatch(data, params, use_user_input,0);
 if debug.enable
    % save and reset debug struct
    debug_save = debug;
    debug = struct('enable', true);
 end
 %% display ranks
-   for s=1:params.number_of_segmentation_per_frame
+   %{
+    for s=1:params.number_of_segmentation_per_frame
         for n = 1:params.num_of_frames
             fprintf('method = %s\n', params.fm.probability_map_method)
             disp('jaccard');
@@ -29,5 +30,8 @@ end
             disp('dice');
             disp(results.ranks{n,s}.dice_valid_seeds);
         end
-   end
+        end
+%}
+   
+  
 

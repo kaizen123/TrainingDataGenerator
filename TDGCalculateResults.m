@@ -12,7 +12,11 @@ iou = zeros(M,1);
 iou_valid = zeros(M,1);
 for m = 1:M
     gt_label  = seeds_info(m).label;
-    seg_label = seg(seeds(m,1), seeds(m,2));
+    if M == 1
+        seg_label = seg(seeds(1), seeds(2));
+    else
+        seg_label = seg(seeds(m,1), seeds(m,2));
+    end
     gt_mask   = zeros(size(ground_truth));
     gt_mask(ground_truth == gt_label) = 1;
     seg_mask = zeros(size(seg));

@@ -11,6 +11,7 @@ function [params] = TDGLoadParams(source_type, cell_dataset, pointer)
 
 TDGStringAssertion(source_type, 'parameters source', 'text', 'script', 'struct','script-shuffle');
 params.cell_dataset                             = cell_dataset;
+params.crop_segmentation = true;
 params.multiple_segmentation_per_frame_enable   = true;
 
 if params.multiple_segmentation_per_frame_enable
@@ -47,7 +48,7 @@ valid = false;
         
         elseif strcmp(temp,'max')
                  valid = true;
-                 params.num_of_frames = 1e3 ;
+                 params.num_of_frames = 1e4 ;
 
         else 
             error('Required number of frames is not a valid number');

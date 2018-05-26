@@ -4,7 +4,7 @@ function [seeds, seeds_info, ground_truth, params] = TDGAutoInput(ground_truth, 
 % with an added gaussian noise in the two axes
 % the function deals with the case of multiple connected components marked on the same label,
 % by applying new labels to second (and forth) components on that same label
-
+sigma = 0;
 global debug
 L = max(ground_truth(:));
 % in case we need new labels, we start the count from the last original label up.
@@ -27,8 +27,8 @@ for label = 1:L % not including background
         current_cell = current_cell + 1;
         centroid = props(idx).Centroid;
         bounding_box = props(idx).BoundingBox;
-        var_cols = 0.05 * (bounding_box(2) + bounding_box(4)/2);
-        var_rows = 0.05 * (bounding_box(1) + bounding_box(3)/2); % x + width(x)/2
+        var_cols = sigma * (bounding_box(2) + bounding_box(4)/2);
+        var_rows = sigma * (bounding_box(1) + bounding_box(3)/2); % x + width(x)/2
         seeds(current_cell,:) = round([centroid(2) + sqrt(var_cols)*randn(), centroid(1) + sqrt(var_rows)*randn()]);
         seeds_info(current_cell).label = correct_label; % fixed label
         seeds_info(current_cell).inside_cell = ...

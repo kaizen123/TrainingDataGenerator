@@ -15,7 +15,7 @@ if strcmp(source_type, 'script') || strcmp(source_type,'script-shuffle')
 	n = 1;
 	switch params.cell_dataset
 	case 'Fluo-N2DH-SIM+'
-		while(n <= params.num_of_frames && iter < 200)
+		while(n <= params.num_of_frames && iter < 1000)
 			train_data_string = fullfile('Fluo-N2DH-SIM+','02',sprintf('t0%02d.tif', iter));
 			train_labels_string = fullfile('Fluo-N2DH-SIM+','02_GT','SEG',sprintf('man_seg0%02d.tif', iter));
 			% load only if we have train labels for current, and more than 2 cells in the frame

@@ -36,7 +36,7 @@ shifted_seeds = zeros(size(seeds));
 % TODO - consider the use of cell functions
 for m = 1:s
 	[speed_map_crop{m}, crop_indices{m}, shifted_seeds(m,:)] = CropImage(speed_map, seeds(m,:), params);
-	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, shifted_seeds(m,:), params.convex_cell_shapes);
+	dist_map_crop{m} = TDGDistanceMaps(speed_map_crop{m}, shifted_seeds(m,:), params.convex_cell_shapes); 
 	dist_map_expended{m} = UnCropImage(size(frame), dist_map_crop{m}, crop_indices{m}, 1/eps);
 	aposteriori_prob(:,:,m+1) = 1./(dist_map_expended{m} + 1);
 	if debug.enable
@@ -66,6 +66,7 @@ function [dist_map] = TDGDistanceMaps(speed_map, seeds, convex_cell_shapes)
 
 global debug;
 
+    
 assert(~any(isnan(seeds(:))) & ~any(seeds(:) < 1) & ~(any(seeds(:,1) > size(speed_map,1))) & ~(any(seeds(:,2) > size(speed_map,2))),...
 	'seed locations are out of bounds');
 assert(~any(isnan(speed_map(:))), 'speed map contains NaN');
@@ -92,6 +93,8 @@ if debug.enable
 	debug.frame{index}.dist_map   = dist_map;
 	debug.frame{index}.seeds_mask = seeds_mask;
 end
+
+
 end
 
 function [crop, crop_indices, shifted_seed] = CropImage(frame,seed,params)
