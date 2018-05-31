@@ -65,7 +65,7 @@ switch params.cell_dataset
 		
 		%params.cell_count_per_frame         = [9 9 8 8 2 ];
 		params.convex_cell_shapes           = false;
-		params.crop_size                    = [200 200];
+		params.crop_size                    = [100 100];
         if filter_shuffle
             params.pp.remove_bg_lighting.enable = random_logic(randperm(length(random_logic)));
             params.pp.remove_bg_lighting.sigma  = 100*random_frac(randperm(length(random_frac)));

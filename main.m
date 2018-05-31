@@ -14,12 +14,14 @@ params         = TDGLoadParams('script-shuffle', cell_dataset);
 
 %% segmentation 
 
-results = TDGSegmentBatch(data, params, use_user_input,0);
+results = TDGSegmentBatch(data, params, use_user_input,params.initial_save_index );
 if debug.enable
    % save and reset debug struct
    debug_save = debug;
    debug = struct('enable', true);
 end
+
+calculate_ranks_hist(results.crop_ranks,params);
 %% display ranks
    %{
     for s=1:params.number_of_segmentation_per_frame

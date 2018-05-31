@@ -11,8 +11,11 @@ function [params] = TDGLoadParams(source_type, cell_dataset, pointer)
 
 TDGStringAssertion(source_type, 'parameters source', 'text', 'script', 'struct','script-shuffle');
 params.cell_dataset                             = cell_dataset;
-params.crop_segmentation = true;
+params.crop_segmentation                        = true;
 params.multiple_segmentation_per_frame_enable   = true;
+params.distort_GT                               = true;
+params.add_groundtruth                          = false;
+params.initial_save_index                       = 0;
 
 if params.multiple_segmentation_per_frame_enable
     
@@ -65,7 +68,7 @@ if strcmp(source_type, 'script')
 		params.th 			                = 0.012;
 		%params.cell_count_per_frame         = [9 9 8 8 2 ];
 		params.convex_cell_shapes           = false;
-		params.crop_size                    = [200 200];
+		params.crop_size                    = [60 60];
 		% PreProcessing parameters
 		params.pp.remove_bg_lighting.enable = true;
 		params.pp.remove_bg_lighting.sigma  = 100;

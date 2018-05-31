@@ -4,7 +4,7 @@ function   TDGSaveData(data,params,results,add_groundtruth)
 % INPUTS:   ...
 % OUTPUTS:  ...
 if nargin == 3
-    add_groundtruth = true;
+    add_groundtruth = false;
 end
 max_directories         = 1000;
 data_set                = params.cell_dataset;

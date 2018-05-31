@@ -1,10 +1,10 @@
-function   TDGSaveCropedData(data,params,results,add_groundtruth,initial_index)
+function   TDGSaveCropedData(data,params,results,add_groundtruth,initial_index,num_of_dist_segs)
 % Save images,segmentations and ranks to
 % ./Results/< data_set >/<dir_index>
 % INPUTS:   ...
 % OUTPUTS:  ...
 if nargin == 3
-    add_groundtruth = true;
+    add_groundtruth = false;
 end
 max_directories         = 1000;
 data_set                = params.cell_dataset;
@@ -13,7 +13,7 @@ results_dir_name        = 'Results';
 dir_content             = dir;
 dir_content             = {dir_content([dir_content.isdir]).name};
 N                       = params.num_of_frames;
-S                       = params.number_of_segmentation_per_frame;
+S                       = params.number_of_segmentation_per_frame+num_of_dist_segs;
 
 if add_groundtruth
     S = S + 1;
@@ -112,8 +112,8 @@ for s = 1 :S
         end
     end
           
-    jaccard_ranks_file  = fopen(sprintf('%s/jaccard_ranks_%s.json',dir_name,num2str(s,'%05d')),'w');
-    dice_ranks_file     = fopen(sprintf('%s/dice_ranks_%s.json',dir_name,num2str(s,'%05d')),'w');
+    jaccard_ranks_file  = fopen(sprintf('%s/jaccard_ranks_%s.json',dir_name,num2str(s,'%05d')),'a');
+    dice_ranks_file     = fopen(sprintf('%s/dice_ranks_%s.json',dir_name,num2str(s,'%05d')),'a');
     fprintf(jaccard_ranks_file,'{\n');
     fprintf(dice_ranks_file,'{\n');
     seg_dir             = strcat(dir_name,sprintf('/seg_%s',num2str(s,'%05d')));
@@ -135,7 +135,7 @@ for s = 1 :S
                 imwrite(image_file,image_path,'tiff');
             end
             if add_groundtruth && s==S 
-                if n==N
+                if n==N && i==I
                     fprintf(jaccard_ranks_file,'"%d": 1\n',idx);
                     fprintf(dice_ranks_file,'"%d": 1\n',idx);
                 else
@@ -144,7 +144,7 @@ for s = 1 :S
                 end
             else
          
-                if n==N
+                if n==N && i==I
                     fprintf(jaccard_ranks_file,'"%d": %f\n',idx,results.crop_ranks{n,s,i}.jaccard_all);
                     fprintf(dice_ranks_file,'"%d": %f\n',idx,results.crop_ranks{n,s,i}.dice_all);
                 else
