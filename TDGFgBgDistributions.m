@@ -40,7 +40,7 @@ if strcmp(params.fm.probability_map_method(s), 'voronoi')
             absolute_background{n,m}         = pre_intensity_values{n,m}(pre_intensity_values{n,m}<=1); % store the absolute bg pixels for further distribution calculation
             %intensity_values{n,m}           = pre_intensity_values{n,m}(pre_intensity_values{n,m}>1); % vanishes all the absolute bg pixels          
             %mirror_intensity_values{n,m}    = cat(1,-1*intensity_values{n,m}(end:-1:1),intensity_values{n,m}); % mirroring the cell to get symetric gmdist 
-            dist_object{n,m}                = fitgmdist(pre_intensity_values{n,m},tot_num_of_gaussians,'Options',statset('MaxIter',1000));
+            dist_object{n,m}                = fitgmdist(pre_intensity_values{n,m},tot_num_of_gaussians,'Options',statset('MaxIter',150));
             dist_values{n,m}                = pdf(dist_object{n,m},params.fm.dens_x);
             [~ , indexs]                    = sort(dist_object{n,m}.mu); % take the minimal mu's to be the bg dist
             bg_index                        = indexs(1:params.voronoi.num_of_bg_gaussians(s));

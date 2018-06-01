@@ -14,7 +14,7 @@ params         = TDGLoadParams('script-shuffle', cell_dataset);
 
 %% segmentation 
 
-results = TDGSegmentBatch(data, params, use_user_input,params.initial_save_index );
+[data,results] = TDGSegmentBatch(data, params, use_user_input,params.initial_save_index );
 if debug.enable
    % save and reset debug struct
    debug_save = debug;

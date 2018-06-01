@@ -1,4 +1,4 @@
-function [results] = TDGSegmentBatch(data, params, user_input,initial_index)
+function [data,results] = TDGSegmentBatch(data, params, user_input,initial_index)
 global debug;
 params.num_of_frames = min([params.num_of_frames length(data.loaded_frame)]);
 N = params.num_of_frames;
@@ -170,12 +170,8 @@ disp('End of basic segmentation, starting crop process')
                 data.croped_ground_truth{n,s,i} = squeeze(croped_ground_truth{n,s}(i,:,:));
                 
                 %%%% translating %%%%
-                max_n = 6;
-                if s==1 || s==2
-                    results.crop_seg{n,s,i} = imtranslate(results.crop_seg{n,s,i},randi([-15 15],2,1));
-                else
-                    results.crop_seg{n,s,i} = imtranslate(results.crop_seg{n,s,i},randi([-max_n*(s-1) max_n*(s-1)],2,1));
-                end
+                max_n = 5;
+                results.crop_seg{n,s,i} = imtranslate(results.crop_seg{n,s,i},randi([-max_n*(s-1) max_n*(s-1)],2,1));
                 results.crop_ranks{n,s,i}       = TDGCalculateCropedResults(results.crop_seg{n,s,i},...
                     data.croped_ground_truth{n,s,i});
                 

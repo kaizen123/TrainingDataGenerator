@@ -11,7 +11,7 @@ function [data, params] = TDGLoadData(source_type, params)
 
 assert(strcmp(source_type, 'script') | strcmp(source_type, 'struct') |strcmp(source_type,'script-shuffle'), 'source_type not supported');
 if strcmp(source_type, 'script') || strcmp(source_type,'script-shuffle')
-	iter = 0;
+	iter = 120;
 	n = 1;
 	switch params.cell_dataset
 	case 'Fluo-N2DH-SIM+'
@@ -48,8 +48,8 @@ if strcmp(source_type, 'script') || strcmp(source_type,'script-shuffle')
         
         case 'Fluo-C2DL-MSC'
 		while(n <= params.num_of_frames && iter < 200)
-			train_data_string = fullfile('Fluo-C2DL-MSC','01',sprintf('t0%02d.tif', iter));
-			train_labels_string = fullfile('Fluo-C2DL-MSC','01_GT','SEG',sprintf('man_seg0%02d.tif', iter));
+			train_data_string = fullfile('Fluo-C2DL-MSC','02',sprintf('t0%02d.tif', iter));
+			train_labels_string = fullfile('Fluo-C2DL-MSC','02_GT','SEG',sprintf('man_seg0%02d.tif', iter));
 			% load only if we have train labels for current, and more than 2 cells in the frame
 			if exist(train_labels_string,'file')
 				ground_truth = TDGLoadDoubleImage(train_labels_string);
