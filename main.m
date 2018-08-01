@@ -5,12 +5,12 @@ global debug;
 debug = struct('enable', false);
 %% primary parameters - dataset, test method, debug etc.
 disp('Welcome to the Training Data Generator for HRM Cell images!')
-cell_dataset = 'Fluo-N2DH-SIM+';
+cell_dataset = 'Fluo-C2DL-MSC';
 use_user_input = false;
 
 %% load data and parameters
-params         = TDGLoadParams('script-shuffle', cell_dataset);
-[data, params] = TDGLoadData('script-shuffle', params);
+params         = TDGLoadParams('script', cell_dataset);
+[data, params] = TDGLoadData('script', params);
 
 %% segmentation 
 

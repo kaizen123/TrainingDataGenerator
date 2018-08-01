@@ -12,8 +12,8 @@ function [params] = TDGLoadParams(source_type, cell_dataset, pointer)
 TDGStringAssertion(source_type, 'parameters source', 'text', 'script', 'struct','script-shuffle');
 params.cell_dataset                             = cell_dataset;
 params.crop_segmentation                        = true;
-params.multiple_segmentation_per_frame_enable   = true;
-params.distort_GT                               = true;
+params.multiple_segmentation_per_frame_enable   = false;
+params.distort_GT                               = false;
 params.add_groundtruth                          = false;
 params.initial_save_index                       = 0;
 
